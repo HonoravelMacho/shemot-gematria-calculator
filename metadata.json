@@ -1,0 +1,6 @@
+{
+  "name": "SHEMOT Gematria CLI",
+  "description": "An interactive dashboard for the SHEMOT Gematria engine and Rust migration blueprint.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
