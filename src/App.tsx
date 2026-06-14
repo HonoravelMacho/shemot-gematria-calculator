@@ -3,28 +3,21 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState } from "react";
 import DashboardHeader from "./components/DashboardHeader";
-import ArchitectureReport from "./components/ArchitectureReport";
 import GematriaCalculator from "./components/GematriaCalculator";
-import CodeComparison from "./components/CodeComparison";
-import { Terminal, Shield, Github, Heart, Globe } from "lucide-react";
+import { Terminal, Shield, Heart } from "lucide-react";
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<string>("blueprint");
-
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col font-sans selection:bg-amber-500/30 selection:text-amber-205">
-      {/* Premium Navigation Header */}
-      <DashboardHeader activeTab={activeTab} setActiveTab={setActiveTab} />
+      {/* Premium Navigation Header with Biblical Verse */}
+      <DashboardHeader />
 
       {/* Main Content Stage */}
       <main className="flex-1 py-10 px-4 md:px-8 xl:px-12 max-w-7xl w-full mx-auto space-y-12">
         
-        {/* Render Tab Context */}
-        {activeTab === "blueprint" && <ArchitectureReport />}
-        {activeTab === "simulator" && <GematriaCalculator />}
-        {activeTab === "code" && <CodeComparison />}
+        {/* Main Gematria Simulator & Calculator */}
+        <GematriaCalculator />
 
         {/* Dynamic Project Status / Banner */}
         <div className="bg-neutral-900/30 border border-neutral-800/80 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-6">

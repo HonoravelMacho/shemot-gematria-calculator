@@ -1,6 +1,6 @@
 {
-  "name": "SHEMOT Gematria CLI",
-  "description": "An interactive dashboard for the SHEMOT Gematria engine and Rust migration blueprint.",
+  "name": "SHEMOT Gematria",
+  "description": "Calculadora e Simulador de Busca de Gematria (Hebreu, Grego e Latino) com dicionário offline integrado e interface mística.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
