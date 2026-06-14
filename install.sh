@@ -63,32 +63,35 @@ echo -e "\n⚙️  Configurando o comando fácil '${YELLOW}shemot${NC}' no seu t
 ALIAS_CMD="alias shemot='bash $TARGET_DIR/shemot.sh'"
 CONFIGURED=false
 
+# Função para remover qualquer alias antigo/desatualizado do shemot
+clean_old_alias() {
+    local file="$1"
+    if [ -f "$file" ]; then
+        grep -v -E "alias shemot=|Comando de inicialização do Shemot" "$file" > "$file.tmp"
+        mv "$file.tmp" "$file"
+    fi
+}
+
 # Configurar para o Bash (.bashrc ou .bash_profile)
 for BASH_FILE in "$HOME/.bashrc" "$HOME/.bash_profile"; do
     if [ -f "$BASH_FILE" ]; then
-        if ! grep -q "alias shemot=" "$BASH_FILE"; then
-            echo "" >> "$BASH_FILE"
-            echo "# Comando de inicialização do Shemot" >> "$BASH_FILE"
-            echo "$ALIAS_CMD" >> "$BASH_FILE"
-            CONFIGURED=true
-            echo -e "${GREEN}✅ Configurado no arquivo: $BASH_FILE${NC}"
-        else
-            CONFIGURED=true
-        fi
+        clean_old_alias "$BASH_FILE"
+        echo "" >> "$BASH_FILE"
+        echo "# Comando de inicialização do Shemot" >> "$BASH_FILE"
+        echo "$ALIAS_CMD" >> "$BASH_FILE"
+        CONFIGURED=true
+        echo -e "${GREEN}✅ Configurado no arquivo: $BASH_FILE${NC}"
     fi
 done
 
 # Configurar para o Zsh (.zshrc) - Padrão em muitos Linux e macOS
 if [ -f "$HOME/.zshrc" ]; then
-    if ! grep -q "alias shemot=" "$HOME/.zshrc"; then
-        echo "" >> "$HOME/.zshrc"
-        echo "# Comando de inicialização do Shemot" >> "$HOME/.zshrc"
-        echo "$ALIAS_CMD" >> "$HOME/.zshrc"
-        CONFIGURED=true
-        echo -e "${GREEN}✅ Configurado no arquivo: $HOME/.zshrc${NC}"
-    else
-        CONFIGURED=true
-    fi
+    clean_old_alias "$HOME/.zshrc"
+    echo "" >> "$HOME/.zshrc"
+    echo "# Comando de inicialização do Shemot" >> "$HOME/.zshrc"
+    echo "$ALIAS_CMD" >> "$HOME/.zshrc"
+    CONFIGURED=true
+    echo -e "${GREEN}✅ Configurado no arquivo: $HOME/.zshrc${NC}"
 fi
 
 if [ "$CONFIGURED" = true ]; then
