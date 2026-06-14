@@ -70,7 +70,7 @@ const PARES_INICIAIS_PERMITIDOS = new Set([
 // TABELA HEBRAICA
 // ===================================
 const TABELA_HEBRAICA: Record<string, number> = {
-  "א (Alef)": 1,   "ב (Beit)": 2,  "ג (Gimel)": 4, "ד (Dalet)": 4, 
+  "א (Alef)": 1,   "ב (Beit)": 2,  "ג (Gimel)": 3, "ד (Dalet)": 4, 
   "ה (He)": 5,    "ו (Vav)": 6,   "ז (Zayin)": 7, "ח (Chet)": 8, 
   "ט (Tet)": 9,   "י (Yod)": 10,  "כ (Kaf)": 20,  "ל (Lamed)": 30, 
   "מ (Mem)": 40,  "נ (Nun)": 50,  "ס (Samech)": 60,"ע (Ayin)": 70, 
@@ -1044,10 +1044,10 @@ export default function GematriaCalculator() {
           const firstLetterTemplate = palTemplate[0];
           const candidates = firstLetterTemplate !== "" ? [firstLetterTemplate] : ALFABETO_LAT_ARR;
 
-          for (let i = 0; i < candidates.length; i++) {
+          for (let latStartIdx = 0; latStartIdx < candidates.length; latStartIdx++) {
             if (cancelRef.current) break;
 
-            const letter = candidates[i];
+            const letter = candidates[latStartIdx];
             const weight = LAT_VALORES[letter] || 0;
             currentWord[0] = letter;
 
@@ -1111,10 +1111,10 @@ export default function GematriaCalculator() {
 
       if (totalLength > 0) {
         // Partition search by Hebrew letters
-        for (let i = 0; i < LETRAS_HEB.length; i++) {
+        for (let hebrewStartIdx = 0; hebrewStartIdx < LETRAS_HEB.length; hebrewStartIdx++) {
           if (cancelRef.current) break;
 
-          const charName = LETRAS_HEB[i];
+          const charName = LETRAS_HEB[hebrewStartIdx];
           const val = TABELA_HEBRAICA[charName];
 
           backtrackHebrewSync([charName], val);
@@ -1203,10 +1203,10 @@ export default function GematriaCalculator() {
 
       if (totalLength > 0) {
         // Partition search by Greek letters
-        for (let i = 0; i < LETRAS_GRECAS.length; i++) {
+        for (let greekStartIdx = 0; greekStartIdx < LETRAS_GRECAS.length; greekStartIdx++) {
           if (cancelRef.current) break;
 
-          const charName = LETRAS_GRECAS[i];
+          const charName = LETRAS_GRECAS[greekStartIdx];
           const val = TABELA_GREGA[charName];
 
           backtrackGreekSync([charName], val);
