@@ -211,6 +211,7 @@ export const PORTUGUESE_DICTIONARY: DictionaryEntry[] = [
   { word: "VONTADE", originalWord: "Vontade", translation: "Eixo de Escolhas", description: "O leme místico do destino humano pelo qual direcionamos a flecha focada do nosso livre arbítrio." },
   { word: "SANGUE", originalWord: "Sangue", translation: "Símbolo da Vida", description: "O fluido vital de vitalidade no plano biológico pelo qual circulam os compromissos arquetípicos hereditários." },
   { word: "CORACAO", originalWord: "Coração", translation: "Templo Vital", description: "Centro metafísico do amor e pulso vital essencial onde reside a fagulha inseparável divina." },
+  { word: "LUCIFER", originalWord: "Lúcifer", translation: "Portador de Luz / Estrela da Manhã", description: "Termo latino originalmente associado à Estrela da Manhã (planeta Vênus), que anuncia a aurora e o nascer do sol. Na Gematria Latina, carrega a soma 74, representando a luz primordial da sabedoria descendente na matéria." },
   { word: "PAX", originalWord: "Pax", translation: "Paz Cósmica", description: "Expressão latina de paz total e concórdia harmônica universal mística." },
   { word: "AMORIS", originalWord: "Amoris", translation: "Amor Divino", description: "Termo latino para os graus elevados do sentimento de amor e dedicação espiritual profunda." },
 

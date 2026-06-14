@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { 
   Play, Download, Trash2, Cpu, Sparkles, Filter, 
   HelpCircle, Settings, ChevronRight, CheckCircle, Flame,
-  Book, Search, Copy, Check, Info
+  Book, Search, Copy, Check, Info, Square
 } from "lucide-react";
 import { AlphabetType, LatinoEstilo, LatinoAvancado, SearchStats } from "../types";
 import { 
@@ -17,6 +17,30 @@ import {
   normalizeWord,
   DictionaryEntry
 } from "../data/dictionaries";
+
+// Helper to format execution time beautifully (Hours, Minutes, Seconds, Milliseconds)
+function formatTime(ms: number): string {
+  if (ms < 1000) {
+    return `${ms}ms`;
+  }
+  const totalSeconds = Math.floor(ms / 1000);
+  const remainingMs = ms % 1000;
+  const seconds = totalSeconds % 60;
+  const totalMinutes = Math.floor(totalSeconds / 60);
+  const minutes = totalMinutes % 60;
+  const hours = Math.floor(totalMinutes / 60);
+
+  let parts: string[] = [];
+  if (hours > 0) parts.push(`${hours}h`);
+  if (minutes > 0) parts.push(`${minutes}m`);
+  
+  if (remainingMs > 0) {
+    parts.push(`${seconds}s ${remainingMs}ms`);
+  } else {
+    parts.push(`${seconds}s`);
+  }
+  return parts.join(" ");
+}
 
 // ===================================
 // LETRAS E VALORES LATINOS (A=1 - Z=26)
@@ -130,6 +154,10 @@ export default function GematriaCalculator() {
   // Output states
   const [results, setResults] = useState<string[]>([]);
   const [isSearching, setIsSearching] = useState<boolean>(false);
+  const cancelRef = useRef<boolean>(false);
+  const cancelSearch = () => {
+    cancelRef.current = true;
+  };
   const [stats, setStats] = useState<SearchStats>({ tested: 0, found: 0, timeMs: 0 });
   const [explanation, setExplanation] = useState<string>("");
 
@@ -638,18 +666,175 @@ export default function GematriaCalculator() {
   // ===================================
   // TRIGGERS DE BUSCA (DFS Backtracking com Poda)
   // ===================================
-  const runSearch = () => {
+  const runSearch = async () => {
     setIsSearching(true);
+    cancelRef.current = false;
     setResults([]);
 
     const startTime = performance.now();
     let combinacoesTestadas = 0;
     const itemsEncontrados: string[] = [];
 
-    // Limitar o cálculo excessivo no navegador
-    const maxTestedCombinationsLimit = 1500000;
+    // Sem limite artificial de combinações testadas para permitir buscas completas e profundas.
+
+    // Scan do Dicionário Direto: encontra instantaneamente as palavras do banco
+    let activeDict: DictionaryEntry[] = [];
+    if (alphabet === AlphabetType.Grego) {
+      activeDict = GREEK_DICTIONARY;
+    } else if (alphabet === AlphabetType.Hebraico) {
+      activeDict = HEBREW_DICTIONARY;
+    } else {
+      activeDict = PORTUGUESE_DICTIONARY;
+    }
+
+    const dictPreMatches: string[] = [];
+    activeDict.forEach(entry => {
+      let sum = 0;
+      const word = entry.word.toUpperCase();
+      
+      for (let i = 0; i < word.length; i++) {
+        const char = word[i];
+        if (alphabet === AlphabetType.Hebraico) {
+          sum += HEBREW_CHAR_VALUES[char] || 0;
+        } else if (alphabet === AlphabetType.Grego) {
+          sum += GREEK_CHAR_VALUES[char] || 0;
+        } else {
+          sum += LAT_VALORES[char] || 0;
+        }
+      }
+
+      if (sum === targetValue) {
+        let matchesCriteria = true;
+
+        if (word.length !== totalLength) {
+          matchesCriteria = false;
+        }
+
+        if (matchesCriteria && alphabet === AlphabetType.Latino && latinoMode === "etimologico") {
+          const pfx = prefix.toUpperCase();
+          const sfx = suffix.toUpperCase();
+          const rad = radical.toUpperCase();
+
+          if (pfx && !word.startsWith(pfx)) matchesCriteria = false;
+          if (sfx && !word.endsWith(sfx)) matchesCriteria = false;
+          if (rad && !word.includes(rad)) matchesCriteria = false;
+        }
+
+        if (matchesCriteria) {
+          if (alphabet === AlphabetType.Hebraico) {
+            const translit = word.split("").map(c => TRANSLITER_HEBRAICA[c] || c).join("");
+            dictPreMatches.push(`${word} (${translit})`);
+          } else if (alphabet === AlphabetType.Grego) {
+            const translit = word.split("").map(c => TRANSLITER_GREGA[c] || c).join("");
+            dictPreMatches.push(`${word} (${translit})`);
+          } else {
+            dictPreMatches.push(word);
+          }
+        }
+      }
+    });
+
+    const foundSet = new Set<string>();
+    dictPreMatches.forEach(w => {
+      foundSet.add(w);
+      itemsEncontrados.push(w);
+    });
+
+    setResults([...itemsEncontrados]);
+    setStats({
+      tested: 0,
+      found: itemsEncontrados.length,
+      timeMs: 1
+    });
+
+    let lastYieldCount = 0;
+    let lastYieldTime = performance.now();
 
     if (alphabet === AlphabetType.Latino) {
+      // PFG Pruning canProceedLatinoInDFS (Poda fonética/estilística compartilhada)
+      const canProceedLatinoInDFS = (partialWord: string[]): boolean => {
+        const len = partialWord.length;
+        if (len === 0) return true;
+
+        // 1. Basic rules: no 3 consecutive identical letters
+        if (len >= 3) {
+          if (partialWord[len - 1] === partialWord[len - 2] && partialWord[len - 2] === partialWord[len - 3]) {
+            return false;
+          }
+        }
+
+        // 2. Basic rules: twin letters are only allowed for RR or SS
+        if (len >= 2) {
+          if (partialWord[len - 1] === partialWord[len - 2]) {
+            const twin = partialWord[len - 2] + partialWord[len - 1];
+            if (twin !== "RR" && twin !== "SS") {
+              return false;
+            }
+            // Flank vowel on the left
+            if (len >= 3 && !VOGAIS.includes(partialWord[len - 3])) {
+              return false;
+            }
+          }
+        }
+
+        // 3. Phonetic rules: no more than 2 consecutive consonants
+        if (len >= 3) {
+          const isC3 = !VOGAIS.includes(partialWord[len - 3]);
+          const isC2 = !VOGAIS.includes(partialWord[len - 2]);
+          const isC1 = !VOGAIS.includes(partialWord[len - 1]);
+          if (isC3 && isC2 && isC1) {
+            return false;
+          }
+        }
+
+        // 4. Phonetic rules: adjacent consonants are only allowed if in PARES_PERMITIDOS
+        if (len >= 2) {
+          const isC2 = !VOGAIS.includes(partialWord[len - 2]);
+          const isC1 = !VOGAIS.includes(partialWord[len - 1]);
+          if (isC2 && isC1) {
+            const pair = partialWord[len - 2] + partialWord[len - 1];
+            if (!PARES_PERMITIDOS.has(pair)) {
+              return false;
+            }
+          }
+        }
+
+        // 5. Stylistic rules: max consecutive vowels in useEstilo
+        if (useEstilo && len >= estilo.maxVSeq + 1) {
+          let allVowels = true;
+          for (let k = 1; k <= estilo.maxVSeq + 1; k++) {
+            if (!VOGAIS.includes(partialWord[len - k])) {
+              allVowels = false;
+              break;
+            }
+          }
+          if (allVowels) {
+            return false;
+          }
+        }
+
+        // 6. Advanced rules: start with consonant
+        if (useAvancado && avancado.iniciarComConsoante) {
+          if (VOGAIS.includes(partialWord[0])) {
+            return false;
+          }
+        }
+
+        // 7. Advanced rules: restrict initial consonant cluster if first two letters are consonants
+        if (useAvancado && avancado.restringirInicioConsonantal && len >= 2) {
+          const c0 = !VOGAIS.includes(partialWord[0]);
+          const c1 = !VOGAIS.includes(partialWord[1]);
+          if (c0 && c1) {
+            const firstPair = partialWord[0] + partialWord[1];
+            if (!PARES_INICIAIS_PERMITIDOS.has(firstPair)) {
+              return false;
+            }
+          }
+        }
+
+        return true;
+      };
+
       if (latinoMode === "etimologico") {
         // Option 1A logic
         const pfx = prefix.toUpperCase();
@@ -694,14 +879,15 @@ export default function GematriaCalculator() {
           }
         }
 
-        // BACKTRACKING DFS para máxima velocidade na filtragem com poda matemática de peso
-        const backtrack = (idx: number, somaAtual: number, currentMeio: string[]) => {
-          if (combinacoesTestadas >= maxTestedCombinationsLimit) {
+        // BACKTRACKING DFS para máxima velocidade na filtragem com poda matemática de peso e fonética ativada
+        const backtrackSync = (idx: number, somaAtual: number, currentMeio: string[]) => {
+          if (cancelRef.current) {
             return;
           }
 
           if (idx === letrasLivres) {
             combinacoesTestadas++;
+
             const meioJoin = currentMeio.join("");
             let palavraCompleta = "";
 
@@ -715,7 +901,10 @@ export default function GematriaCalculator() {
             if (palavraCompleta.length === totalLength && valorPalavraLatino(palavraCompleta) === targetValue) {
               if (regrasBasicasLatino(palavraCompleta) && regrasFoneticasLatino(palavraCompleta)) {
                 if (applyEstilo(palavraCompleta) && applyFiltroAvancado(palavraCompleta)) {
-                  itemsEncontrados.push(palavraCompleta);
+                  if (!foundSet.has(palavraCompleta)) {
+                    foundSet.add(palavraCompleta);
+                    itemsEncontrados.push(palavraCompleta);
+                  }
                 }
               }
             }
@@ -728,15 +917,53 @@ export default function GematriaCalculator() {
             return;
           }
 
+          // Poda fonética em tempo real no DFS
+          if (idx > 0) {
+            const partial: string[] = [];
+            if (!isPal) {
+              for (let k = 0; k < pfx.length; k++) partial.push(pfx[k]);
+              for (let k = 0; k < rad.length; k++) partial.push(rad[k]);
+              for (let k = 0; k < idx; k++) partial.push(currentMeio[k]);
+            } else {
+              for (let k = 0; k < idx; k++) partial.push(currentMeio[k]);
+            }
+
+            if (!canProceedLatinoInDFS(partial)) {
+              return;
+            }
+          }
+
           for (let i = 0; i < ALFABETO_LAT_ARR.length; i++) {
             const letter = ALFABETO_LAT_ARR[i];
             const weight = LAT_VALORES[letter];
             currentMeio[idx] = letter;
-            backtrack(idx + 1, somaAtual + weight, currentMeio);
+            backtrackSync(idx + 1, somaAtual + weight, currentMeio);
           }
         };
 
-        backtrack(0, 0, Array(letrasLivres).fill(""));
+        if (letrasLivres > 0) {
+          const currentMeio = Array(letrasLivres).fill("");
+          for (let i = 0; i < ALFABETO_LAT_ARR.length; i++) {
+            if (cancelRef.current) break;
+
+            const letter = ALFABETO_LAT_ARR[i];
+            const weight = LAT_VALORES[letter];
+            currentMeio[0] = letter;
+
+            backtrackSync(1, weight, currentMeio);
+
+            const now = performance.now();
+            setStats({
+              tested: combinacoesTestadas,
+              found: itemsEncontrados.length,
+              timeMs: Math.max(1, Math.round(now - startTime))
+            });
+            setResults([...itemsEncontrados]);
+            await new Promise(resolve => setTimeout(resolve, 0));
+          }
+        } else {
+          backtrackSync(0, 0, []);
+        }
 
       } else {
         // Option 1B: Personalizada (Locking specific letters)
@@ -762,16 +989,20 @@ export default function GematriaCalculator() {
         });
 
         // Fast backtracking
-        const backtrackCustom = (idx: number, somaAtual: number, currentWord: string[]) => {
-          if (combinacoesTestadas >= maxTestedCombinationsLimit) return;
+        const backtrackCustomSync = (idx: number, somaAtual: number, currentWord: string[]) => {
+          if (cancelRef.current) return;
 
           if (idx === totalLength) {
             combinacoesTestadas++;
+
             const palavraCompleta = currentWord.join("");
             if (somaAtual === targetValue && regrasBasicasLatino(palavraCompleta)) {
               if (regrasFoneticasLatino(palavraCompleta)) {
                 if (applyEstilo(palavraCompleta) && applyFiltroAvancado(palavraCompleta)) {
-                  itemsEncontrados.push(palavraCompleta);
+                  if (!foundSet.has(palavraCompleta)) {
+                    foundSet.add(palavraCompleta);
+                    itemsEncontrados.push(palavraCompleta);
+                  }
                 }
               }
             }
@@ -784,32 +1015,64 @@ export default function GematriaCalculator() {
             return;
           }
 
+          // Poda fonética customizada em tempo real
+          if (idx > 0) {
+            const partial = currentWord.slice(0, idx);
+            if (!canProceedLatinoInDFS(partial)) {
+              return;
+            }
+          }
+
           if (palTemplate[idx] !== "") {
             const letter = palTemplate[idx];
             const weight = LAT_VALORES[letter] || 0;
             currentWord[idx] = letter;
-            backtrackCustom(idx + 1, somaAtual + weight, currentWord);
+            backtrackCustomSync(idx + 1, somaAtual + weight, currentWord);
           } else {
             for (let i = 0; i < ALFABETO_LAT_ARR.length; i++) {
               const letter = ALFABETO_LAT_ARR[i];
               const weight = LAT_VALORES[letter];
               currentWord[idx] = letter;
-              backtrackCustom(idx + 1, somaAtual + weight, currentWord);
+              backtrackCustomSync(idx + 1, somaAtual + weight, currentWord);
             }
             currentWord[idx] = "";
           }
         };
 
-        backtrackCustom(0, 0, Array(totalLength).fill(""));
+        if (totalLength > 0) {
+          const currentWord = Array(totalLength).fill("");
+          const firstLetterTemplate = palTemplate[0];
+          const candidates = firstLetterTemplate !== "" ? [firstLetterTemplate] : ALFABETO_LAT_ARR;
+
+          for (let i = 0; i < candidates.length; i++) {
+            if (cancelRef.current) break;
+
+            const letter = candidates[i];
+            const weight = LAT_VALORES[letter] || 0;
+            currentWord[0] = letter;
+
+            backtrackCustomSync(1, weight, currentWord);
+
+            const now = performance.now();
+            setStats({
+              tested: combinacoesTestadas,
+              found: itemsEncontrados.length,
+              timeMs: Math.max(1, Math.round(now - startTime))
+            });
+            setResults([...itemsEncontrados]);
+            await new Promise(resolve => setTimeout(resolve, 0));
+          }
+        }
       }
 
     } else if (alphabet === AlphabetType.Hebraico) {
       // Hebraico search: Simple DFS
-      const backtrackHebrew = (combi: string[], somaAtual: number) => {
-        if (combinacoesTestadas >= maxTestedCombinationsLimit) return;
+      const backtrackHebrewSync = (combi: string[], somaAtual: number) => {
+        if (cancelRef.current) return;
 
         if (combi.length === totalLength) {
           combinacoesTestadas++;
+
           if (somaAtual === targetValue) {
             const palavraCrua = combi.map(k => k.split(" ")[0]).join("");
             const palavraFormatada = formatHebrewWord(palavraCrua);
@@ -822,7 +1085,11 @@ export default function GematriaCalculator() {
 
             // Create beautiful transliteration for Hebrew too
             const translit = palavraFormatada.split("").map(c => TRANSLITER_HEBRAICA[c] || c).join("");
-            itemsEncontrados.push(`${palavraFormatada} (${translit})`);
+            const keyWord = `${palavraFormatada} (${translit})`;
+            if (!foundSet.has(keyWord)) {
+              foundSet.add(keyWord);
+              itemsEncontrados.push(keyWord);
+            }
           }
           return;
         }
@@ -837,16 +1104,34 @@ export default function GematriaCalculator() {
           const charName = LETRAS_HEB[i];
           const val = TABELA_HEBRAICA[charName];
           combi.push(charName);
-          backtrackHebrew(combi, somaAtual + val);
+          backtrackHebrewSync(combi, somaAtual + val);
           combi.pop();
         }
       };
 
-      backtrackHebrew([], 0);
+      if (totalLength > 0) {
+        // Partition search by Hebrew letters
+        for (let i = 0; i < LETRAS_HEB.length; i++) {
+          if (cancelRef.current) break;
+
+          const charName = LETRAS_HEB[i];
+          const val = TABELA_HEBRAICA[charName];
+
+          backtrackHebrewSync([charName], val);
+
+          const now = performance.now();
+          setStats({
+            tested: combinacoesTestadas,
+            found: itemsEncontrados.length,
+            timeMs: Math.max(1, Math.round(now - startTime))
+          });
+          setResults([...itemsEncontrados]);
+          await new Promise(resolve => setTimeout(resolve, 0));
+        }
+      }
 
     } else if (alphabet === AlphabetType.Grego) {
       // Grego search with custom rules
-      // Transliterações e regras gregas específicas
       const excessoConsoantes = (pal: string, max: number): boolean => {
         const VOGAIS_GREGAS = "ΑΕΗΙΟΥΩ";
         let consecutivas = 0;
@@ -864,11 +1149,12 @@ export default function GematriaCalculator() {
       const finaisValidas = ["Ν", "Ρ", "Σ", "Ξ", "Ψ"];
       const iniciosProibidos = ["ΒΓ", "ΒΔ", "ΚΘ", "ΤΚ", "ΔΧ", "ΓΘ"];
 
-      const backtrackGreek = (combi: string[], somaAtual: number) => {
-        if (combinacoesTestadas >= maxTestedCombinationsLimit) return;
+      const backtrackGreekSync = (combi: string[], somaAtual: number) => {
+        if (cancelRef.current) return;
 
         if (combi.length === totalLength) {
           combinacoesTestadas++;
+
           if (somaAtual === targetValue) {
             const palavraCompleta = combi.map(k => k.split(" ")[0]).join("");
             
@@ -892,7 +1178,11 @@ export default function GematriaCalculator() {
 
             // Transliterate
             const translit = palavraCompleta.split("").map(c => TRANSLITER_GREGA[c] || c).join("");
-            itemsEncontrados.push(`${palavraCompleta} (${translit})`);
+            const keyWord = `${palavraCompleta} (${translit})`;
+            if (!foundSet.has(keyWord)) {
+              foundSet.add(keyWord);
+              itemsEncontrados.push(keyWord);
+            }
           }
           return;
         }
@@ -906,12 +1196,31 @@ export default function GematriaCalculator() {
           const charName = LETRAS_GRECAS[i];
           const val = TABELA_GREGA[charName];
           combi.push(charName);
-          backtrackGreek(combi, somaAtual + val);
+          backtrackGreekSync(combi, somaAtual + val);
           combi.pop();
         }
       };
 
-      backtrackGreek([], 0);
+      if (totalLength > 0) {
+        // Partition search by Greek letters
+        for (let i = 0; i < LETRAS_GRECAS.length; i++) {
+          if (cancelRef.current) break;
+
+          const charName = LETRAS_GRECAS[i];
+          const val = TABELA_GREGA[charName];
+
+          backtrackGreekSync([charName], val);
+
+          const now = performance.now();
+          setStats({
+            tested: combinacoesTestadas,
+            found: itemsEncontrados.length,
+            timeMs: Math.max(1, Math.round(now - startTime))
+          });
+          setResults([...itemsEncontrados]);
+          await new Promise(resolve => setTimeout(resolve, 0));
+        }
+      }
     }
 
     const endTime = performance.now();
@@ -1439,15 +1748,24 @@ export default function GematriaCalculator() {
           </div>
         )}
 
-        {/* Run Button */}
-        <button
-          onClick={runSearch}
-          disabled={isSearching}
-          className="w-full bg-amber-500 hover:bg-amber-400 disabled:bg-neutral-800 disabled:text-neutral-600 text-neutral-950 font-bold py-3 px-4 rounded-xl transition duration-150 flex items-center justify-center gap-2 shadow-md cursor-pointer text-sm"
-        >
-          <Play className="h-4 w-4 fill-current" />
-          {isSearching ? "Buscando combinações..." : "Iniciar Motor de Busca"}
-        </button>
+        {/* Run / Cancel Button Group */}
+        {isSearching ? (
+          <button
+            onClick={cancelSearch}
+            className="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 px-4 rounded-xl transition duration-150 flex items-center justify-center gap-2 shadow-md cursor-pointer text-sm animate-pulse"
+          >
+            <Square className="h-4 w-4 fill-current text-white" />
+            Parar Busca (Cancelar)
+          </button>
+        ) : (
+          <button
+            onClick={runSearch}
+            className="w-full bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold py-3 px-4 rounded-xl transition duration-150 flex items-center justify-center gap-2 shadow-md cursor-pointer text-sm"
+          >
+            <Play className="h-4 w-4 fill-current" />
+            Iniciar Motor de Busca
+          </button>
+        )}
 
         {/* Card: Consulta Rápida ao Dicionário */}
         <div id="quick-dictionary-card" className="bg-neutral-900/60 p-5 md:p-6 rounded-2xl border border-neutral-800 space-y-4 text-left">
@@ -1583,9 +1901,9 @@ export default function GematriaCalculator() {
           </div>
 
           <div className="bg-neutral-900/40 border border-neutral-800 p-4 rounded-2xl">
-            <span className="text-[10px] text-neutral-400 uppercase tracking-wider block font-mono">Tempo Milissegundos</span>
+            <span className="text-[10px] text-neutral-400 uppercase tracking-wider block font-mono">Duração da Busca</span>
             <div className="text-lg font-bold text-emerald-400 mt-1 font-mono">
-              {stats.timeMs}ms
+              {formatTime(stats.timeMs)}
             </div>
           </div>
 
@@ -1663,7 +1981,7 @@ export default function GematriaCalculator() {
           )}
 
           {/* Console Content screen */}
-          <div className="flex-1 p-5 font-mono text-xs overflow-y-auto space-y-2 text-left bg-neutral-950">
+          <div translate="no" className="flex-1 p-5 font-mono text-xs overflow-y-auto space-y-2 text-left bg-neutral-950 notranslate">
             <div className="text-neutral-500">
               # Terminal inicializado. Pronto para buscas combinatórias em {alphabet.toUpperCase()}.
               {dictionaryFilterMode !== "all" && ` (Filtrado: apenas termos do dicionário offline)`}
