@@ -95,6 +95,79 @@ const TRANSLITER_GREGA: Record<string, string> = {
   "Ρ": "R", "Σ": "S", "Τ": "T", "Υ": "Y", "Φ": "PH", "Χ": "CH", "Ψ": "PS", "Ω": "O", "Ϡ": "TS"
 };
 
+const LATIN_TO_HEBREW_MAP: Record<string, string> = {
+  'A': 'א', 'B': 'ב', 'G': 'ג', 'D': 'ד', 'H': 'ה', 'V': 'ו', 'W': 'ו', 'Z': 'ז', 'X': 'ח', 'T': 'ט',
+  'Y': 'י', 'I': 'י', 'K': 'כ', 'L': 'ל', 'M': 'מ', 'N': 'נ', 'S': 'ס', 'E': 'ע', 'P': 'פ', 'F': 'פ',
+  'C': 'צ', 'Q': 'ק', 'R': 'ר', 'U': 'ש', 'O': 'ת'
+};
+
+const LATIN_TO_GREEK_MAP: Record<string, string> = {
+  'A': 'Α', 'B': 'Β', 'G': 'Γ', 'D': 'Δ', 'E': 'Ε', '6': 'Ϛ', 'Z': 'Ζ', 'H': 'Η', 'Q': 'Θ',
+  'I': 'Ι', 'K': 'Κ', 'L': 'Λ', 'M': 'Μ', 'N': 'Ν', 'X': 'Ξ', 'O': 'Ο', 'P': 'Π', '9': 'Ϙ',
+  'R': 'Ρ', 'S': 'Σ', 'T': 'Τ', 'U': 'Υ', 'Y': 'Υ', 'F': 'Φ', 'C': 'Χ', 'W': 'Ψ', 'V': 'Ω',
+  '8': 'Ϡ'
+};
+
+const HEBREW_KEYBOARD_ITEMS = [
+  { char: "א", name: "Alef", key: "A", val: 1 },
+  { char: "ב", name: "Beit", key: "B", val: 2 },
+  { char: "ג", name: "Gimel", key: "G", val: 3 },
+  { char: "ד", name: "Dalet", key: "D", val: 4 },
+  { char: "ה", name: "He", key: "H", val: 5 },
+  { char: "ו", name: "Vav", key: "V/W", val: 6 },
+  { char: "ז", name: "Zayin", key: "Z", val: 7 },
+  { char: "ח", name: "Chet", key: "X", val: 8 },
+  { char: "ט", name: "Tet", key: "T", val: 9 },
+  { char: "י", name: "Yod", key: "Y/I", val: 10 },
+  { char: "כ", name: "Kaf", key: "K", val: 20 },
+  { char: "ך", name: "Kaf Sofit", key: "k *", val: 20 },
+  { char: "ל", name: "Lamed", key: "L", val: 30 },
+  { char: "מ", name: "Mem", key: "M", val: 40 },
+  { char: "ם", name: "Mem Sofit", key: "m *", val: 40 },
+  { char: "נ", name: "Nun", key: "N", val: 50 },
+  { char: "ן", name: "Nun Sofit", key: "n *", val: 50 },
+  { char: "ס", name: "Samech", key: "S", val: 60 },
+  { char: "ע", name: "Ayin", key: "E", val: 70 },
+  { char: "פ", name: "Pe", key: "P/F", val: 80 },
+  { char: "ף", name: "Pe Sofit", key: "pf-fim", val: 80 },
+  { char: "צ", name: "Tzadi", key: "C", val: 90 },
+  { char: "ץ", name: "Tzadi Sofit", key: "c-fim", val: 90 },
+  { char: "ק", name: "Kof", key: "Q", val: 100 },
+  { char: "ר", name: "Resh", key: "R", val: 200 },
+  { char: "ש", name: "Shin", key: "U", val: 300 },
+  { char: "ת", name: "Tav", key: "O", val: 400 },
+];
+
+const GREEK_KEYBOARD_ITEMS = [
+  { char: "Α", name: "Alfa", key: "A", val: 1 },
+  { char: "Β", name: "Beta", key: "B", val: 2 },
+  { char: "Γ", name: "Gama", key: "G", val: 3 },
+  { char: "Δ", name: "Delta", key: "D", val: 4 },
+  { char: "Ε", name: "Epsilon", key: "E", val: 5 },
+  { char: "Ϛ", name: "Stigma", key: "6", val: 6 },
+  { char: "Ζ", name: "Zeta", key: "Z", val: 7 },
+  { char: "Η", name: "Eta", key: "H", val: 8 },
+  { char: "Θ", name: "Theta", key: "Q", val: 9 },
+  { char: "Ι", name: "Iota", key: "I", val: 10 },
+  { char: "Κ", name: "Kapa", key: "K", val: 20 },
+  { char: "Λ", name: "Lambda", key: "L", val: 30 },
+  { char: "Μ", name: "Mi", key: "M", val: 40 },
+  { char: "Ν", name: "Ni", key: "N", val: 50 },
+  { char: "Ξ", name: "Xi", key: "X", val: 60 },
+  { char: "Ο", name: "Omicron", key: "O", val: 70 },
+  { char: "Π", name: "Pi", key: "P", val: 80 },
+  { char: "Ϙ", name: "Koppa", key: "9", val: 90 },
+  { char: "Ρ", name: "Ro", key: "R", val: 100 },
+  { char: "Σ", name: "Sigma", key: "S", val: 200 },
+  { char: "Τ", name: "Tau", key: "T", val: 300 },
+  { char: "Υ", name: "Ipsilon", key: "U", val: 400 },
+  { char: "Φ", name: "Fi", key: "F", val: 500 },
+  { char: "Χ", name: "Chi", key: "C", val: 600 },
+  { char: "Ψ", name: "Psi", key: "W", val: 700 },
+  { char: "Ω", name: "Omega", key: "V", val: 800 },
+  { char: "Ϡ", name: "Sampi", key: "8", val: 900 },
+];
+
 export default function GematriaCalculator() {
   const [alphabet, setAlphabet] = useState<AlphabetType>(AlphabetType.Latino);
   const [targetValue, setTargetValue] = useState<number>(55);
@@ -148,6 +221,12 @@ export default function GematriaCalculator() {
   const [dictionaryFilterMode, setDictionaryFilterMode] = useState<"all" | "words-only" | "words-meanings">("all");
   const [lookupText, setLookupText] = useState<string>("");
   const [copiedWord, setCopiedWord] = useState<string | null>(null);
+  const [dictAlphabet, setDictAlphabet] = useState<AlphabetType>(AlphabetType.Latino);
+
+  const [autoConvertHebraico, setAutoConvertHebraico] = useState<boolean>(true);
+  const [autoConvertGrego, setAutoConvertGrego] = useState<boolean>(true);
+  const [showKeymapHebraico, setShowKeymapHebraico] = useState<boolean>(false);
+  const [showKeymapGrego, setShowKeymapGrego] = useState<boolean>(false);
 
   const [outputFormat, setOutputFormat] = useState<"pure" | "valued">("valued");
 
@@ -624,6 +703,8 @@ export default function GematriaCalculator() {
     }
     return palavra;
   }
+
+
 
   function regrasBasicasHebraico(palavra: string): boolean {
     const len = palavra.length;
@@ -1679,6 +1760,8 @@ export default function GematriaCalculator() {
               )}
             </div>
 
+
+
           </div>
         )}
 
@@ -1690,12 +1773,16 @@ export default function GematriaCalculator() {
             <div className="flex items-center justify-between">
               <span className="text-neutral-300">Aplicar Regras de Escrita e Fonética (Sofit, Duplicações e Conjunções)</span>
               <input
+                id="toggle-use-hebrew-rules"
                 type="checkbox"
                 checked={useHebrewRules}
                 onChange={(e) => setUseHebrewRules(e.target.checked)}
                 className="accent-amber-500 cursor-pointer"
               />
             </div>
+
+
+
           </div>
         )}
 
@@ -1707,6 +1794,7 @@ export default function GematriaCalculator() {
             <div className="flex items-center justify-between">
               <span className="text-neutral-300">Aplicar Regras Fonéticas do Grego Koiné (Contração, Sílabas e Assimilações)</span>
               <input
+                id="toggle-use-greek-koine"
                 type="checkbox"
                 checked={useGreekKoineFilter}
                 onChange={(e) => setUseGreekKoineFilter(e.target.checked)}
@@ -1717,6 +1805,7 @@ export default function GematriaCalculator() {
             <div className="flex items-center justify-between">
               <span className="text-neutral-300">Usar Finais Gregos Comuns (Ν, Ρ, Σ, Ξ, Ψ)</span>
               <input
+                id="toggle-use-greek-finais"
                 type="checkbox"
                 checked={useGreekFinais}
                 onChange={(e) => setUseGreekFinais(e.target.checked)}
@@ -1727,6 +1816,7 @@ export default function GematriaCalculator() {
             <div className="flex items-center justify-between">
               <span className="text-neutral-300">Restringir Início Grego Proibido (ΒΓ, ΒΔ, etc)</span>
               <input
+                id="toggle-use-greek-inicios"
                 type="checkbox"
                 checked={useGreekIniciosProibidos}
                 onChange={(e) => setUseGreekIniciosProibidos(e.target.checked)}
@@ -1737,6 +1827,7 @@ export default function GematriaCalculator() {
             <div className="space-y-1">
               <span className="text-neutral-400 block font-mono text-[10px] text-left">Máx Consoantes Seguidas: {greekMaxConsonantes}</span>
               <input
+                id="range-greek-max-consonantes"
                 type="range"
                 min="2"
                 max="4"
@@ -1745,6 +1836,9 @@ export default function GematriaCalculator() {
                 className="w-full accent-amber-500 h-1 bg-neutral-800 rounded"
               />
             </div>
+
+
+
           </div>
         )}
 
@@ -1769,14 +1863,35 @@ export default function GematriaCalculator() {
 
         {/* Card: Consulta Rápida ao Dicionário */}
         <div id="quick-dictionary-card" className="bg-neutral-900/60 p-5 md:p-6 rounded-2xl border border-neutral-800 space-y-4 text-left">
-          <div className="flex items-center gap-2 pb-3 border-b border-neutral-800">
+          <div className="flex items-center gap-2 pb-1 border-b border-neutral-800">
             <Book className="text-amber-500 h-4 w-4" />
-            <h4 className="font-bold text-white text-xs uppercase tracking-wider font-mono">Dicionário Offline & Copiar/Colar</h4>
+            <h4 className="font-bold text-white text-xs uppercase tracking-wider font-mono">Dicionário & Calculadora Unificada</h4>
           </div>
 
           <p className="text-[11px] text-neutral-400 leading-relaxed font-sans">
-            Digite ou cole palavras em <strong>Grego</strong>, <strong>Hebraico</strong> ou <strong>Português</strong> para calcular a Gematria e ver o significado místico catalogado.
+            Selecione o alfabeto, digite na barra de busca (com mapeamento fonético opcional) ou utilize o teclado virtual para calcular sintonias de imediato.
           </p>
+
+          {/* Alphabet Tabs */}
+          <div className="flex bg-neutral-950 p-1 rounded-xl border border-neutral-800 text-xs">
+            {Object.values(AlphabetType).map((type) => (
+              <button
+                key={type}
+                type="button"
+                onClick={() => {
+                  setDictAlphabet(type);
+                  setLookupText("");
+                }}
+                className={`flex-1 py-1.5 rounded-lg transition-all font-semibold uppercase font-mono cursor-pointer text-center ${
+                  dictAlphabet === type
+                    ? "bg-amber-500 text-neutral-950 font-bold shadow-sm"
+                    : "text-neutral-400 hover:text-white"
+                }`}
+              >
+                {type}
+              </button>
+            ))}
+          </div>
 
           <div className="space-y-3">
             <div className="relative">
@@ -1784,24 +1899,183 @@ export default function GematriaCalculator() {
                 type="text"
                 value={lookupText}
                 onChange={(e) => {
-                  setLookupText(e.target.value);
+                  let val = e.target.value;
+                  if (dictAlphabet === AlphabetType.Hebraico) {
+                    if (autoConvertHebraico) {
+                      let converted = "";
+                      for (let i = 0; i < val.length; i++) {
+                        const char = val[i].toUpperCase();
+                        if (LATIN_TO_HEBREW_MAP[char]) {
+                          converted += LATIN_TO_HEBREW_MAP[char];
+                        } else {
+                          converted += val[i];
+                        }
+                      }
+                      const words = converted.split(" ");
+                      const formattedWords = words.map(w => formatHebrewWord(w));
+                      val = formattedWords.join(" ");
+                    }
+                  } else if (dictAlphabet === AlphabetType.Grego) {
+                    if (autoConvertGrego) {
+                      let converted = "";
+                      for (let i = 0; i < val.length; i++) {
+                        const char = val[i].toUpperCase();
+                        if (LATIN_TO_GREEK_MAP[char]) {
+                          converted += LATIN_TO_GREEK_MAP[char];
+                        } else {
+                          converted += val[i];
+                        }
+                      }
+                      val = converted;
+                    }
+                  } else {
+                    val = val.replace(/[^A-Za-z\s]/g, "");
+                  }
+                  setLookupText(val);
                   setCopiedWord(null);
                 }}
-                placeholder="Ex: LOGOS, שלום, DEUS, AMOR..."
-                className="w-full bg-neutral-950 border border-neutral-800 focus:border-amber-500/50 rounded-xl px-3 py-2 text-xs text-white placeholder-neutral-600 outline-none pr-8 transition"
+                placeholder={
+                  dictAlphabet === AlphabetType.Latino
+                    ? "Ex: JESUS, DEUS, AMOR..."
+                    : dictAlphabet === AlphabetType.Hebraico
+                    ? autoConvertHebraico
+                      ? "Digite em Latim (Ex: BARAK ou SLM)"
+                      : "Digite em Hebraico (Ex: שלום)"
+                    : autoConvertGrego
+                    ? "Digite em Latim (Ex: LOGOS ou IESOUS)"
+                    : "Digite em Grego (Ex: ΛΟΓΟΣ)"
+                }
+                className="w-full bg-neutral-950 border border-neutral-800 focus:border-amber-500/50 rounded-xl px-3 py-2 text-xs text-white placeholder-neutral-600 outline-none pr-16 transition"
               />
-              <Search className="absolute right-2.5 top-2.5 h-3.5 w-3.5 text-neutral-600" />
+              <div className="absolute right-2 top-2 flex gap-1.5 items-center">
+                {lookupText && (
+                  <button
+                    type="button"
+                    onClick={() => setLookupText("")}
+                    className="text-[10px] text-neutral-400 hover:text-white hover:bg-neutral-900 border border-neutral-800 rounded px-1 cursor-pointer"
+                  >
+                    Limpar
+                  </button>
+                )}
+                <Search className="h-3.5 w-3.5 text-neutral-600" />
+              </div>
             </div>
 
-            {lookupText.trim() && (() => {
-              // Auto-detect alphabet
-              let detectedAlphabet = AlphabetType.Latino;
-              if (/[\u0590-\u05FF]/.test(lookupText)) {
-                detectedAlphabet = AlphabetType.Hebraico;
-              } else if (/[\u0370-\u03FF\u1F00-\u1FFF]/.test(lookupText)) {
-                detectedAlphabet = AlphabetType.Grego;
-              }
+            {/* Hebrew Specific Keyboard Actions */}
+            {dictAlphabet === AlphabetType.Hebraico && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-[11px] bg-neutral-950/35 p-1 px-1.5 rounded-lg border border-neutral-900">
+                  <div className="flex items-center gap-1.5 cursor-pointer select-none">
+                    <input
+                      id="toggle-autoconvert-heb"
+                      type="checkbox"
+                      checked={autoConvertHebraico}
+                      onChange={(e) => setAutoConvertHebraico(e.target.checked)}
+                      className="accent-amber-500 cursor-pointer"
+                    />
+                    <label htmlFor="toggle-autoconvert-heb" className="text-neutral-300 cursor-pointer text-[10px]">
+                      Mapear teclado latino automaticamente
+                    </label>
+                  </div>
 
+                  <button
+                    id="btn-show-keymap-heb"
+                    type="button"
+                    onClick={() => setShowKeymapHebraico(!showKeymapHebraico)}
+                    className="text-[10px] text-amber-400 hover:text-amber-300 font-semibold cursor-pointer underline decoration-dotted"
+                  >
+                    {showKeymapHebraico ? "Ocultar Teclado" : "Ver Teclado / Guia"}
+                  </button>
+                </div>
+
+                {/* Keyboard Layout */}
+                {showKeymapHebraico && (
+                  <div className="p-3 bg-neutral-950/80 rounded-xl border border-neutral-900 space-y-2">
+                    <p className="text-[10px] text-neutral-400 font-sans leading-normal">
+                      Clique nas teclas para digitar ou digite as teclas latinas do seu teclado físico:
+                    </p>
+                    <div className="grid grid-cols-5 sm:grid-cols-7 gap-1">
+                      {HEBREW_KEYBOARD_ITEMS.map((item) => (
+                        <button
+                          id={`heb-key-${item.char}`}
+                          key={item.char}
+                          type="button"
+                          onClick={() => {
+                            const newVal = lookupText + item.char;
+                            const words = newVal.split(" ");
+                            const formatted = words.map(w => formatHebrewWord(w)).join(" ");
+                            setLookupText(formatted);
+                          }}
+                          className="bg-neutral-900/60 hover:bg-neutral-850 border border-neutral-800 hover:border-amber-500/30 rounded-lg p-1 text-center transition flex flex-col items-center justify-center cursor-pointer select-none"
+                        >
+                          <span className="text-base font-bold text-amber-200">{item.char}</span>
+                          <span className="text-[9px] text-neutral-400 font-mono uppercase">{item.key}</span>
+                          <span className="text-[8px] text-neutral-500 font-mono">{item.val}</span>
+                        </button>
+                      ))}
+                    </div>
+                    <div className="pt-1.5 border-t border-neutral-900 text-[9px] text-neutral-400 font-mono leading-relaxed space-y-1">
+                      <div><span className="text-amber-500 font-bold">Autocorreção de Sofit ativa</span>: Letras finais serão ajustadas automaticamente no final de cada termo!</div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {dictAlphabet === AlphabetType.Grego && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-[11px] bg-neutral-950/35 p-1 px-1.5 rounded-lg border border-neutral-900">
+                  <div className="flex items-center gap-1.5 cursor-pointer select-none">
+                    <input
+                      id="toggle-autoconvert-gr"
+                      type="checkbox"
+                      checked={autoConvertGrego}
+                      onChange={(e) => setAutoConvertGrego(e.target.checked)}
+                      className="accent-amber-500 cursor-pointer"
+                    />
+                    <label htmlFor="toggle-autoconvert-gr" className="text-neutral-300 cursor-pointer text-[10px]">
+                      Mapear teclado latino automaticamente
+                    </label>
+                  </div>
+
+                  <button
+                    id="btn-show-keymap-gr"
+                    type="button"
+                    onClick={() => setShowKeymapGrego(!showKeymapGrego)}
+                    className="text-[10px] text-amber-400 hover:text-amber-300 font-semibold cursor-pointer underline decoration-dotted"
+                  >
+                    {showKeymapGrego ? "Ocultar Teclado" : "Ver Teclado / Guia"}
+                  </button>
+                </div>
+
+                {/* Keyboard Layout */}
+                {showKeymapGrego && (
+                  <div className="p-3 bg-neutral-950/80 rounded-xl border border-neutral-900 space-y-2">
+                    <p className="text-[10px] text-neutral-400 font-sans leading-normal">
+                      Clique nas teclas para digitar ou digite as teclas latinas do seu teclado físico:
+                    </p>
+                    <div className="grid grid-cols-5 sm:grid-cols-7 gap-1">
+                      {GREEK_KEYBOARD_ITEMS.map((item) => (
+                        <button
+                          id={`gr-key-${item.char}`}
+                          key={item.char}
+                          type="button"
+                          onClick={() => setLookupText(lookupText + item.char)}
+                          className="bg-neutral-900/60 hover:bg-neutral-850 border border-neutral-850 hover:border-amber-500/30 rounded-lg p-1 text-center transition flex flex-col items-center justify-center cursor-pointer select-none"
+                        >
+                          <span className="text-base font-bold text-amber-200">{item.char}</span>
+                          <span className="text-[9px] text-neutral-400 font-mono uppercase">{item.key}</span>
+                          <span className="text-[8px] text-neutral-500 font-mono">{item.val}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {lookupText.trim() && (() => {
+              const detectedAlphabet = dictAlphabet;
               const { total, breakdown } = calculateStringGematria(lookupText, detectedAlphabet);
               const matchedEntry = findDictionaryEntry(lookupText, detectedAlphabet);
 
@@ -1815,9 +2089,10 @@ export default function GematriaCalculator() {
                 <div className="bg-neutral-950/80 p-3 rounded-xl border border-neutral-800/80 space-y-2 text-xs text-left">
                   <div className="flex justify-between items-center bg-neutral-900 px-2 py-1 rounded border border-neutral-800">
                     <span className="text-[10px] text-neutral-400 font-mono">
-                      Alfabeto: <strong className="text-amber-500 uppercase">{detectedAlphabet}</strong>
+                      Alfabeto Ativo: <strong className="text-amber-500 uppercase">{detectedAlphabet}</strong>
                     </span>
                     <button
+                      type="button"
                       onClick={handleCopy}
                       className="text-[10px] text-neutral-400 hover:text-white flex items-center gap-1 cursor-pointer bg-neutral-900 px-1.5 py-0.5 rounded border border-neutral-800"
                     >
@@ -1836,13 +2111,13 @@ export default function GematriaCalculator() {
                   </div>
 
                   <div className="flex justify-between items-baseline gap-2 pt-1">
-                    <span className="text-neutral-500 font-mono text-[10px]">Soma Gematria:</span>
+                    <span className="text-neutral-500 font-mono text-[10px]">Soma Equivalente:</span>
                     <span className="text-lg font-bold text-amber-400 font-mono">
                       {total}
                     </span>
                   </div>
 
-                  <div className="text-[10px] text-neutral-400 font-mono leading-relaxed bg-neutral-900/40 p-1.5 rounded max-h-12 overflow-y-auto border border-neutral-900">
+                  <div className="text-[10px] text-neutral-300 font-mono leading-relaxed bg-neutral-900/40 p-1.5 rounded max-h-12 overflow-y-auto border border-neutral-900">
                     {breakdown}
                   </div>
 
@@ -1861,7 +2136,7 @@ export default function GematriaCalculator() {
                   ) : (
                     <div className="border-t border-neutral-800 pt-2 flex items-center gap-1.5 text-neutral-500 text-[10px] italic font-sans pr-1">
                       <Info className="h-3.5 w-3.5 text-amber-500/65 flex-shrink-0" />
-                      <span>Não enciclopediada no dicionário offline. Somada com sucesso!</span>
+                      <span>Não listado no dicionário offline. Apresentando cálculo puro de somatória.</span>
                     </div>
                   )}
                 </div>
