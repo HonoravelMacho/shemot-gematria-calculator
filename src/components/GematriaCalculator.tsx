@@ -263,6 +263,13 @@ export default function GematriaCalculator() {
   const cancelRef = useRef<boolean>(false);
   const cancelSearch = () => {
     cancelRef.current = true;
+    const isTauri = typeof window !== "undefined" && (
+      (window as any).__TAURI__ !== undefined || 
+      (window as any).__TAURI_INTERNALS__ !== undefined
+    );
+    if (isTauri) {
+      (window as any).__TAURI__.invoke("cancel_search").catch(console.error);
+    }
   };
   const [stats, setStats] = useState<SearchStats>({ tested: 0, found: 0, timeMs: 0 });
   const [explanation, setExplanation] = useState<string>("");
@@ -851,6 +858,85 @@ export default function GematriaCalculator() {
       found: itemsEncontrados.length,
       timeMs: 1
     });
+
+    const isTauri = typeof window !== "undefined" && (
+      (window as any).__TAURI__ !== undefined || 
+      (window as any).__TAURI_INTERNALS__ !== undefined
+    );
+
+    if (isTauri) {
+      try {
+        const tauriInvoke = (window as any).__TAURI__.invoke;
+        const tauriEvent = (window as any).__TAURI__.event;
+        
+        let unlistenProgress: (() => void) | undefined;
+        let lastTested = 0;
+        let lastFound = itemsEncontrados.length;
+
+        if (tauriEvent && tauriEvent.listen) {
+          unlistenProgress = await tauriEvent.listen("search_progress", (event: any) => {
+            const payload = event.payload;
+            lastTested = payload.tested;
+            lastFound = payload.found;
+            setStats({
+              tested: payload.tested,
+              found: payload.found + itemsEncontrados.length,
+              timeMs: Math.max(1, Math.round(performance.now() - startTime))
+            });
+          });
+        }
+
+        const tauriResults: any[] = await tauriInvoke("run_gematria_search", {
+          targetValue,
+          totalLength,
+          alphabet: alphabet.toLowerCase(),
+          latinoMode,
+          prefix,
+          suffix,
+          radical,
+          modoRadical,
+          fixedLettersInput,
+          useEstilo,
+          minV: estilo.minV,
+          maxV: estilo.maxV,
+          minC: estilo.minC,
+          maxC: estilo.maxC,
+          maxVSeq: estilo.maxVSeq,
+          useAvancado,
+          iniciarComConsoante: avancado.iniciarComConsoante,
+          terminarComVogal: avancado.terminarComVogal,
+          permitirK: avancado.permitirK,
+          permitirW: avancado.permitirW,
+          permitirY: avancado.permitirY,
+          restringirFinais: avancado.restringirFinais,
+          permitirFinaisEstrangeiros: avancado.permitirFinaisEstrangeiros,
+          restringirInicioConsonantal: avancado.restringirInicioConsonantal,
+          useHebrewRules,
+          useGreekFinais,
+          useGreekIniciosProibidos,
+          greekMaxConsonantes,
+          useGreekKoineFilter,
+        });
+
+        if (unlistenProgress) {
+          unlistenProgress();
+        }
+
+        const wordsOnly = tauriResults.map(r => r.word);
+        const combined = Array.from(new Set([...itemsEncontrados, ...wordsOnly]));
+
+        setResults(combined);
+        setStats({
+          tested: lastTested || 100000,
+          found: combined.length,
+          timeMs: Math.max(1, Math.round(performance.now() - startTime))
+        });
+        setIsSearching(false);
+        return;
+      } catch (err) {
+        console.error("Tauri Search failed, falling back to JS Search:", err);
+      }
+    }
 
     let lastYieldCount = 0;
     let lastYieldTime = performance.now();
