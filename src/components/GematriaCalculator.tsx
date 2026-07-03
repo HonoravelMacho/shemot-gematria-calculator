@@ -18,6 +18,33 @@ import {
   DictionaryEntry
 } from "../data/dictionaries";
 
+const cleanWordCache = new Map<string, string>();
+function getCleanWord(word: string): string {
+  let cached = cleanWordCache.get(word);
+  if (cached === undefined) {
+    cached = normalizeWord(word).replace(/\s+/g, "");
+    cleanWordCache.set(word, cached);
+  }
+  return cached;
+}
+
+const PORTUGUESE_DICT_MAP = new Map<string, DictionaryEntry>();
+const HEBREW_DICT_MAP = new Map<string, DictionaryEntry>();
+const GREEK_DICT_MAP = new Map<string, DictionaryEntry>();
+
+PORTUGUESE_DICTIONARY.forEach(entry => {
+  const key = getCleanWord(entry.word);
+  PORTUGUESE_DICT_MAP.set(key, entry);
+});
+HEBREW_DICTIONARY.forEach(entry => {
+  const key = getCleanWord(entry.word);
+  HEBREW_DICT_MAP.set(key, entry);
+});
+GREEK_DICTIONARY.forEach(entry => {
+  const key = getCleanWord(entry.word);
+  GREEK_DICT_MAP.set(key, entry);
+});
+
 // Helper to format execution time beautifully (Hours, Minutes, Seconds, Milliseconds)
 function formatTime(ms: number): string {
   if (ms < 1000) {
@@ -63,7 +90,7 @@ const PARES_PERMITIDOS = new Set([
 
 const PARES_INICIAIS_PERMITIDOS = new Set([
   "BR", "CR", "DR", "FR", "GR", "PR", "TR", "VR", "BL", "CL", "FL", "GL", "PL", "TL",
-  "PS", "GN", "PN", "TM", "MN", "PT", "CT", "ST"
+  "CH"
 ]);
 
 // ===================================
@@ -640,20 +667,17 @@ export default function GematriaCalculator() {
   };
 
   function findDictionaryEntry(rawWord: string, currentAlphabet: AlphabetType): DictionaryEntry | null {
-    // Extract base word without the "(translit)" part if present
-    const cleanWord = normalizeWord(rawWord.split(" (")[0]).replace(/\s+/g, "");
+    const cleanWord = getCleanWord(rawWord.split(" (")[0]);
     if (!cleanWord) return null;
 
-    let dict: DictionaryEntry[] = [];
     if (currentAlphabet === AlphabetType.Grego) {
-      dict = GREEK_DICTIONARY;
+      return GREEK_DICT_MAP.get(cleanWord) || null;
     } else if (currentAlphabet === AlphabetType.Hebraico) {
-      dict = HEBREW_DICTIONARY;
+      return HEBREW_DICT_MAP.get(cleanWord) || null;
     } else if (currentAlphabet === AlphabetType.Latino) {
-      dict = PORTUGUESE_DICTIONARY;
+      return PORTUGUESE_DICT_MAP.get(cleanWord) || null;
     }
-
-    return dict.find(entry => normalizeWord(entry.word).replace(/\s+/g, "") === cleanWord) || null;
+    return null;
   }
 
   function calculateStringGematria(str: string, currentAlphabet: AlphabetType): { total: number; breakdown: string } {
@@ -1047,16 +1071,62 @@ export default function GematriaCalculator() {
         }
 
       } else {
-        // Option 1B: Personalizada (Locking specific letters)
-        // Parse fixedLettersInput (e.g. "1A,3A")
+        // Option 1B: Personalizada (Locking specific letters and support wildcards e.g. "1T,#H,5C,6C")
+        interface WildcardSpec {
+          char: string;
+          minIdx: number;
+          maxIdx: number;
+        }
+
         const fixas: Record<number, string> = {};
+        const wildcards: WildcardSpec[] = [];
+
         if (fixedLettersInput.trim()) {
-          const pairs = fixedLettersInput.split(",");
-          pairs.forEach(p => {
-            const num = p.replace(/\D/g, "");
-            const letVal = p.replace(/[^A-Za-z]/g, "").toUpperCase();
-            if (num && letVal) {
-              fixas[parseInt(num, 10) - 1] = letVal;
+          const parts = fixedLettersInput.split(",").map(p => p.trim()).filter(Boolean);
+          const parsedItems: ({ type: "fixed"; idx: number; char: string } | { type: "wildcard"; char: string })[] = [];
+          
+          parts.forEach(p => {
+            if (p.startsWith("#")) {
+              const char = p.replace(/[^A-Za-z]/g, "").toUpperCase();
+              if (char) {
+                parsedItems.push({ type: "wildcard", char });
+              }
+            } else {
+              const num = p.replace(/\D/g, "");
+              const char = p.replace(/[^A-Za-z]/g, "").toUpperCase();
+              if (num && char) {
+                const idx = parseInt(num, 10) - 1;
+                if (idx >= 0 && idx < totalLength) {
+                  fixas[idx] = char;
+                  parsedItems.push({ type: "fixed", idx, char });
+                }
+              }
+            }
+          });
+
+          parsedItems.forEach((item, itemIdx) => {
+            if (item.type === "wildcard") {
+              let minIdx = 0;
+              for (let l = itemIdx - 1; l >= 0; l--) {
+                if (parsedItems[l].type === "fixed") {
+                  minIdx = (parsedItems[l] as any).idx + 1;
+                  break;
+                }
+              }
+              
+              let maxIdx = totalLength - 1;
+              for (let r = itemIdx + 1; r < parsedItems.length; r++) {
+                if (parsedItems[r].type === "fixed") {
+                  maxIdx = (parsedItems[r] as any).idx - 1;
+                  break;
+                }
+              }
+              
+              wildcards.push({
+                char: item.char,
+                minIdx,
+                maxIdx
+              });
             }
           });
         }
@@ -1069,6 +1139,31 @@ export default function GematriaCalculator() {
           }
         });
 
+        const matchesWildcards = (word: string, specs: WildcardSpec[]): boolean => {
+          if (specs.length === 0) return true;
+          
+          const m = specs.length;
+          const search = (specIdx: number, lastWordIdx: number): boolean => {
+            if (specIdx === m) return true;
+            
+            const spec = specs[specIdx];
+            const start = Math.max(lastWordIdx + 1, spec.minIdx);
+            const end = spec.maxIdx;
+            
+            for (let i = start; i <= end; i++) {
+              if (fixas[i] !== undefined) continue; // Must be a free position
+              if (word[i] === spec.char) {
+                if (search(specIdx + 1, i)) {
+                  return true;
+                }
+              }
+            }
+            return false;
+          };
+          
+          return search(0, -1);
+        };
+
         // Fast backtracking
         const backtrackCustomSync = (idx: number, somaAtual: number, currentWord: string[]) => {
           if (cancelRef.current) return;
@@ -1080,9 +1175,11 @@ export default function GematriaCalculator() {
             if (somaAtual === targetValue && regrasBasicasLatino(palavraCompleta)) {
               if (regrasFoneticasLatino(palavraCompleta)) {
                 if (applyEstilo(palavraCompleta) && applyFiltroAvancado(palavraCompleta)) {
-                  if (!foundSet.has(palavraCompleta)) {
-                    foundSet.add(palavraCompleta);
-                    itemsEncontrados.push(palavraCompleta);
+                  if (matchesWildcards(palavraCompleta, wildcards)) {
+                    if (!foundSet.has(palavraCompleta)) {
+                      foundSet.add(palavraCompleta);
+                      itemsEncontrados.push(palavraCompleta);
+                    }
                   }
                 }
               }
