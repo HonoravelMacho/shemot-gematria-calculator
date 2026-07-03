@@ -27,7 +27,7 @@ export default function DashboardHeader({ activeTab, setActiveTab }: HeaderProps
               </span>
             </h1>
             <p className="text-xs text-neutral-400 font-sans mt-0.5">
-              &quot;Em busca do nome perfeito&quot; — Ecossistema de Gematria Multilíngue por Tiago Rabelo Sels
+              &quot;Em busca do nome perfeito&quot; — Ecossistema de Gematria, Isopsefia e numerologia Multilíngue criado por Tiago Rabelo.
             </p>
           </div>
         </div>
