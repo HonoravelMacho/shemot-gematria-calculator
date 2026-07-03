@@ -7,6 +7,7 @@ pub mod alphabets;
 pub mod rules_latin;
 pub mod rules_greek;
 pub mod rules_hebrew;
+pub mod search;
 
 // Re-export core items for clean external access
 pub use alphabets::valor_letra_latino;
@@ -19,4 +20,8 @@ pub use rules_greek::{
 };
 pub use rules_hebrew::{
     valor_palavra_hebraico, format_hebrew_word,
+};
+pub use search::{
+    backtrack_latino_etimologico, backtrack_latino_custom,
+    backtrack_hebraico, backtrack_grego, WildcardSpec,
 };
