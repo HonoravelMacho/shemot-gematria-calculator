@@ -20,7 +20,7 @@ Quer descobrir quais sequências ou frases geram exatamente uma soma específica
 *   Gere caminhos combinatórios baseados em sub-blocos matemáticos puros.
 *   Filtre os dados gerados em tempo real de acordo com as ocorrências no dicionário integrado.
 
-### 3. 📖 Dicionário Offline de Alta Densidade (Mais de 100 Termos)
+### 3. 📖 Dicionário Offline de Baixa Densidade (Pouco mais de 100 Termos famosos para teste de comparação)
 Um acervo teológico e místico offline contendo os principais conceitos catalogados:
 *   **Grego clássico**: Termos filosóficos (ex: *Lógos*, *Agape*, *Sophia*, *Phos*, *Theos*, *Gnosis*, *Abraxas*).
 *   **Hebreu cabalístico**: Termos da Árvore da Vida, Sefirot, nomes divinos sagrados e anjos (ex: *YHVH*, *Shalom*, *Eheyeh*, *Kadosh*, *Metatron*, *Yeshua*).
