@@ -1,0 +1,494 @@
+[
+  {
+    "word": "DEUS",
+    "originalWord": "Deus",
+    "translation": "Princípio Criador",
+    "description": "Origem absoluta das ordens do universo, divindade de emanação integral transcendente."
+  },
+  {
+    "word": "AMOR",
+    "originalWord": "Amor",
+    "translation": "União Espiritual",
+    "description": "Força de atração compassiva unificadora de tudo no cosmos, desprovida de possessões egoicas."
+  },
+  {
+    "word": "VIDA",
+    "originalWord": "Vida",
+    "translation": "Sopro Animador",
+    "description": "O fluir eterno das transformações da consciência habitando suportes materiais transitórios."
+  },
+  {
+    "word": "LUZ",
+    "originalWord": "Luz",
+    "translation": "Discernimento Divino",
+    "description": "Radiação esclarecedora de mentes puras que desintegra ilusões da obscuridade material."
+  },
+  {
+    "word": "PAZ",
+    "originalWord": "Paz",
+    "translation": "Sossego Místico",
+    "description": "Cessação absoluta de conflitos interiores egoicos, gerando o silêncio da plenitude sagrada."
+  },
+  {
+    "word": "VERDADE",
+    "originalWord": "Verdade",
+    "translation": "Realidade Essencial",
+    "description": "O alinhamento da mente consciente com a constituição autêntica incorruptível do Ser."
+  },
+  {
+    "word": "ESPIRITO",
+    "originalWord": "Espírito",
+    "translation": "Chama Superior",
+    "description": "A porção indivisível divina de natureza sutil transcendente e imorredoura."
+  },
+  {
+    "word": "SABEDORIA",
+    "originalWord": "Sabedoria",
+    "translation": "Ciência Cósmica",
+    "description": "Aplicação ética virtuosa obtida através da unificação de inteligência teórica com compaixão."
+  },
+  {
+    "word": "JUSTICA",
+    "originalWord": "Justiça",
+    "translation": "Equilíbrio da Balança",
+    "description": "Ação ordenadora da causa e efeito natural que repõe equilíbrios em todos os quadrantes do universo."
+  },
+  {
+    "word": "FE",
+    "originalWord": "Fé",
+    "translation": "Elo Fiel Invisível",
+    "description": "A percepção intuitiva ativa de convicção em realidades eternas que não podem ser medidas em laboratórios."
+  },
+  {
+    "word": "CRISTO",
+    "originalWord": "Cristo",
+    "translation": "Consagração do Eu",
+    "description": "Estado imaculado de unificação crística, onde a vontade humana funde-se inteiramente na vontade celeste."
+  },
+  {
+    "word": "VERBO",
+    "originalWord": "Verbo",
+    "translation": "Pronunciamento das Leis",
+    "description": "A vibração inaugural, o som geométrico inteligível criativo projetado no útero da matéria primordial."
+  },
+  {
+    "word": "ALMA",
+    "originalWord": "Alma",
+    "translation": "Condutor de Experiências",
+    "description": "O invólucro sutil que armazena memórias biográficas evolutivas e as transfere para ascensão divina."
+  },
+  {
+    "word": "MUNDO",
+    "originalWord": "Mundo",
+    "translation": "Teatro Sensorial",
+    "description": "Cenário mutável de forças planetárias densas para o aprendizado iniciático das almas em provação."
+  },
+  {
+    "word": "TEMPLO",
+    "originalWord": "Templo",
+    "translation": "Casa de Oração",
+    "description": "Fraga consagrada onde a geometria, fragrâncias e mentes sintonizam-se para atração angelical."
+  },
+  {
+    "word": "SAGRADO",
+    "originalWord": "Sagrado",
+    "translation": "Votação do Alto",
+    "description": "Tudo o que foi elevado, blindado de detritos mundanos, com destino exclusivo ao Criador."
+  },
+  {
+    "word": "MAGIA",
+    "originalWord": "Magia",
+    "translation": "Arte Real da Vontade",
+    "description": "Manipulação de causas invisíveis fundamentadas nas leis das analogias (Macrocosmos vs Microcosmos) para efeitos perceptivos."
+  },
+  {
+    "word": "ALQUIMIA",
+    "originalWord": "Alquimia",
+    "translation": "Transmutação Íntima",
+    "description": "A purificação do chumbo e gozo mundano da personalidade no ouro eterno purificado do Espírito."
+  },
+  {
+    "word": "KABBALAH",
+    "originalWord": "Kabbalah",
+    "translation": "Tradição / Recepção",
+    "description": "Ensinamentos ocultos místico-esotéricos de interpretação das emanações cósmicas e do Nome de Deus."
+  },
+  {
+    "word": "ESTRELA",
+    "originalWord": "Estrela",
+    "translation": "Diretrizes de Guia",
+    "description": "Ponto cintilante ideal que orienta com sua vibração geométrica navegantes em mares sombrios."
+  },
+  {
+    "word": "SOL",
+    "originalWord": "Sol",
+    "translation": "Fogo Crístico",
+    "description": "O coração invisível solar doador de abundâncias diárias a todos, justos e injustos igualmente."
+  },
+  {
+    "word": "LUA",
+    "originalWord": "Lua",
+    "translation": "Espelho da Mente",
+    "description": "Astro regulador de marés, que capta as águas subliminares de receptividade onírica e imaginação reflexiva."
+  },
+  {
+    "word": "ARTE",
+    "originalWord": "Arte",
+    "translation": "Beleza Manifesta",
+    "description": "Canalização de inspiração divina sublime em arranjos materiais harmônicos para elevação humana."
+  },
+  {
+    "word": "MENTE",
+    "originalWord": "Mente",
+    "translation": "Atelier Mental",
+    "description": "Geradora ativa de formas-pensamento que estruturam imediatamente realidades e laços cármicos."
+  },
+  {
+    "word": "TERRA",
+    "originalWord": "Terra",
+    "translation": "Sustentação Maciça",
+    "description": "Suporte fértil planetário estável passivo que ancora as dinâmicas espirituais de provação."
+  },
+  {
+    "word": "FOGO",
+    "originalWord": "Fogo",
+    "translation": "Combustão Iniciadora",
+    "description": "Fervor purificador do entusiasmo e ímpeto que decompõe detritos e acende a chama interior."
+  },
+  {
+    "word": "AGUA",
+    "originalWord": "Água",
+    "translation": "Sentimento Fluido",
+    "description": "Elemento de memória cósmica receptiva, adaptável, mansa e consoladora das perturbações."
+  },
+  {
+    "word": "AR",
+    "originalWord": "Ar",
+    "translation": "Sopro de Comunicação",
+    "description": "Fluidez aérea vital de transmissão de mensagens intelectuais e inteligibilidade cósmica."
+  },
+  {
+    "word": "FORCA",
+    "originalWord": "Força",
+    "translation": "Dinamismo Ativo",
+    "description": "Vigor canalizado necessário para erguer realidades e derrubar barreiras densas de resistência cármica."
+  },
+  {
+    "word": "GLORIA",
+    "originalWord": "Glória",
+    "translation": "Radiância Vitoriosa",
+    "description": "Esplendor espiritual emitido por heróis virtuosos da alma vitoriosos sobre as ilusões egocêntricas."
+  },
+  {
+    "word": "HARMONIA",
+    "originalWord": "Harmonia",
+    "translation": "Simetria Estética",
+    "description": "Vínculo proporcional ideal entre as notas, cores, ou virtudes que reflete a integridade primeva."
+  },
+  {
+    "word": "ORACULO",
+    "originalWord": "Oráculo",
+    "translation": "Portal dos Pronunciamentos",
+    "description": "Dispositivo de contemplação sutil onde sacerdotes lêem a escrita críptica do destino."
+  },
+  {
+    "word": "INICIADO",
+    "originalWord": "Iniciado",
+    "translation": "O que renasceu",
+    "description": "Aquele cuja personalidade mundana 'morreu' ritualisticamente e que ressuscitou no altar dos saberes."
+  },
+  {
+    "word": "VONTADE",
+    "originalWord": "Vontade",
+    "translation": "Eixo de Escolhas",
+    "description": "O leme místico do destino humano pelo qual direcionamos a flecha focada do nosso livre arbítrio."
+  },
+  {
+    "word": "SANGUE",
+    "originalWord": "Sangue",
+    "translation": "Símbolo da Vida",
+    "description": "O fluido vital de vitalidade no plano biológico pelo qual circulam os compromissos arquetípicos hereditários."
+  },
+  {
+    "word": "CORACAO",
+    "originalWord": "Coração",
+    "translation": "Templo Vital",
+    "description": "Centro metafísico do amor e pulso vital essencial onde reside a fagulha inseparável divina."
+  },
+  {
+    "word": "LUCIFER",
+    "originalWord": "Lúcifer",
+    "translation": "Portador de Luz / Estrela da Manhã",
+    "description": "Termo latino originalmente associado à Estrela da Manhã (planeta Vênus), que anuncia a aurora e o nascer do sol. Na Gematria Latina, carrega a soma 74, representando a luz primordial da sabedoria descendente na matéria."
+  },
+  {
+    "word": "PAX",
+    "originalWord": "Pax",
+    "translation": "Paz Cósmica",
+    "description": "Expressão latina de paz total e concórdia harmônica universal mística."
+  },
+  {
+    "word": "AMORIS",
+    "originalWord": "Amoris",
+    "translation": "Amor Divino",
+    "description": "Termo latino para os graus elevados do sentimento de amor e dedicação espiritual profunda."
+  },
+  {
+    "word": "ARCANJO",
+    "originalWord": "Arcanjo",
+    "translation": "Governador Celestial / Arcanjo",
+    "description": "Classe angélica suprema encarregada de administrar ordens universais espaciais e capitanear batalhas de luz sutil."
+  },
+  {
+    "word": "ANJO",
+    "originalWord": "Anjo",
+    "translation": "Guia / Mensageiro de Luz",
+    "description": "Sentinela e tutor espiritual que ampara a evolução moral da consciência humana inspirando preceitos harmônicos."
+  },
+  {
+    "word": "INICIACAO",
+    "originalWord": "Iniciação",
+    "translation": "O Despertar de Mistérios",
+    "description": "O rito e série de provações que enterram figurativamente o ego mundano desprovido de luz para gerar o homem regenerado."
+  },
+  {
+    "word": "GNOSI",
+    "originalWord": "Gnose / Gnosi",
+    "translation": "Gnose / Saber Direto",
+    "description": "Conhecimento existencial absoluto das leis de criação obtido pela autorrevelação interior do espírito."
+  },
+  {
+    "word": "TEOSOFIA",
+    "originalWord": "Teosofia",
+    "translation": "Conhecimento Divino",
+    "description": "Saber arcaico unificador das leis que regem a evolução cósmica e as religiões sob a lente hermética."
+  },
+  {
+    "word": "COSMOS",
+    "originalWord": "Cosmos / Cosme",
+    "translation": "Universo Harmônico",
+    "description": "O universo absoluto equilibrado e ornado por perfeições matemáticas oposto ao abismo inerte."
+  },
+  {
+    "word": "EQUILIBRIO",
+    "originalWord": "Equilíbrio",
+    "translation": "Pano de Balança",
+    "description": "Estado neutro ideal onde as polaridades se compensam e permitem a quietude do espírito."
+  },
+  {
+    "word": "TRANSFORMACAO",
+    "originalWord": "Transformação",
+    "translation": "Reforma de Formas",
+    "description": "O processo constante e gradual que modifica as qualidades corporais para acolhimento de emanações superiores."
+  },
+  {
+    "word": "TRANSMUTACAO",
+    "originalWord": "Transmutação",
+    "translation": "Operação Alquímica",
+    "description": "Elevação qualitativa radical que converte chumbo mental degradado em ouro sutil purificado."
+  },
+  {
+    "word": "CARIDADE",
+    "originalWord": "Caridade",
+    "translation": "Doação Invisível",
+    "description": "A maior virtude de doação ativa que estende a mão às fraquezas materiais e dores alheias sem anseios."
+  },
+  {
+    "word": "MEDITACAO",
+    "originalWord": "Meditação",
+    "translation": "Silêncio Concentrado",
+    "description": "O repouso absoluto mental que cala os ruídos do corpo para escuta interna das directrizes divinas."
+  },
+  {
+    "word": "ORACAO",
+    "originalWord": "Oração",
+    "translation": "Prece de Elevação",
+    "description": "Alinhamento amoroso e direcional dos pensamentos ao Altíssimo invocando auxílios espirituais sagrados."
+  },
+  {
+    "word": "RITUAL",
+    "originalWord": "Ritual / Cerimônia",
+    "translation": "Prática Ceremonial",
+    "description": "Conjunto ordenado de gestos simbólicos invocatórios que modulam os fluxos sutis de energia no plano denso."
+  },
+  {
+    "word": "DESTINO",
+    "originalWord": "Destino / Fado",
+    "translation": "Lei do Carma",
+    "description": "O caminho inexorável de oportunidades evolutivas traçado pela ordem de causa e efeito das ações realizadas."
+  },
+  {
+    "word": "VIRTUDE",
+    "originalWord": "Virtude / Virtudes",
+    "translation": "Pilar Moral / Escudo",
+    "description": "A qualidade interna que capacita o ser a seguir as ordens espirituais elevadas resistindo aos arrastos pesados."
+  },
+  {
+    "word": "MISERICORDIA",
+    "originalWord": "Misericórdia",
+    "translation": "Graça Compassiva",
+    "description": "A expansão acolhedora que releva distorções alheias e auxilia a reestruturação moral das almas feridas."
+  },
+  {
+    "word": "RIGOR",
+    "originalWord": "Rigor / Julgamento",
+    "translation": "Disciplina / Severidade",
+    "description": "A força divina delimitadora que ergue cercas de proteção e impede a proliferação do erro e das trevas."
+  },
+  {
+    "word": "BELEZA",
+    "originalWord": "Beleza / Estética",
+    "translation": "Reflexo da Ordem",
+    "description": "Harmonia visível das proporções sagradas que alegra e induz o sensor à veneração do Invisível."
+  },
+  {
+    "word": "ETERNIDADE",
+    "originalWord": "Eternidade",
+    "translation": "Mundo Imutável",
+    "description": "A presença do Absoluto fora das ilusões temporais onde não há deterioração moral de substâncias."
+  },
+  {
+    "word": "CONSCIENCIA",
+    "originalWord": "Consciência",
+    "translation": "Presença Desperta",
+    "description": "O observador imaculado, núcleo inteligível eterno imorredouro que assiste a jornada evolutiva."
+  },
+  {
+    "word": "KETHER",
+    "originalWord": "Kether",
+    "translation": "A Coroa Suprema",
+    "description": "Opção transliterada da primeira Sephirah da Árvore da Vida, a fonte de onde emana a luz infinita."
+  },
+  {
+    "word": "CHOKMAH",
+    "originalWord": "Chokmah",
+    "translation": "A Sabedoria Divina",
+    "description": "A segunda Sephirah, o lampejo criativo original de pura energia sem forma."
+  },
+  {
+    "word": "BINAH",
+    "originalWord": "Binah",
+    "translation": "A Compreensão Divina",
+    "description": "A terceira Sephirah, o útero cósmico que dá forma e estrutura às emanações divinas."
+  },
+  {
+    "word": "CHESED",
+    "originalWord": "Chesed",
+    "translation": "A Misericórdia Celestial",
+    "description": "A quarta Sephirah, representando a doação incondicional, o amor e a benevolência divina expansiva."
+  },
+  {
+    "word": "GEBURAH",
+    "originalWord": "Geburah",
+    "translation": "O Rigor Severo",
+    "description": "A quinta Sephirah, canalizadora da força, do julgamento e da restrição necessária para o equilíbrio cósmico."
+  },
+  {
+    "word": "TIPHERETH",
+    "originalWord": "Tiphereth",
+    "translation": "A Beleza Harmonizadora",
+    "description": "A sexta Sephirah, localizada no coração da Árvore, equilibrando a misericórdia com a rigidez."
+  },
+  {
+    "word": "NETZACH",
+    "originalWord": "Netzach",
+    "translation": "A Vitória Eterna",
+    "description": "A sétima Sephirah, associada à persistência, aos instintos criativos, à vitória vibracional e às artes."
+  },
+  {
+    "word": "HOD",
+    "originalWord": "Hod",
+    "translation": "O Esplendor Intelectivo",
+    "description": "A oitava Sephirah, representando a mente concreta, a estética ordenada, as leis e o esplendor do detalhe."
+  },
+  {
+    "word": "YESOD",
+    "originalWord": "Yesod",
+    "translation": "O Fundamento do Mundo",
+    "description": "A nona Sephirah, matriz de luz sutil astral que recolhe as energias superiores e as projeta na terra."
+  },
+  {
+    "word": "MALKUTH",
+    "originalWord": "Malkuth",
+    "translation": "O Reino Material",
+    "description": "A décima Sephirah, correspondendo ao campo de matéria densa física e laboratório terreno de evolução."
+  },
+  {
+    "word": "DAATH",
+    "originalWord": "Daath",
+    "translation": "O Portal do Conhecimento",
+    "description": "A Sephirah invisível que representa a profundidade da experiência direta que conecta a mente ao Divino."
+  },
+  {
+    "word": "SEPHIRAH",
+    "originalWord": "Sephirah / Sephiroth",
+    "translation": "Esfera de Luz Divina",
+    "description": "Esfera ou emanação cósmica por onde a luz do Absoluto (Ein Sof) desce estruturando os planos celestes e materiais."
+  },
+  {
+    "word": "HERMETISMO",
+    "originalWord": "Hermetismo",
+    "translation": "Doutrinas de Hermes",
+    "description": "O corpo de ensinamentos místico-filosóficos de Hermes Trismegisto sobre correspondência, mentalismo e vibração."
+  },
+  {
+    "word": "TRISMEGISTO",
+    "originalWord": "Trismegisto",
+    "translation": "O Três Vezes Grande",
+    "description": "Epíteto de Hermes, unificador supremo das três porções da sabedoria universal: alquimia, astrologia e teurgia."
+  },
+  {
+    "word": "EVOLUCAO",
+    "originalWord": "Evolução",
+    "translation": "Escalada da Consciência",
+    "description": "O impulso inexorável de ascensão progressiva que liberta as consciências e as atrai de volta ao Criador."
+  },
+  {
+    "word": "CENTELHA",
+    "originalWord": "Centelha Divina",
+    "translation": "Fagulha Celeste",
+    "description": "A partícula sutil indestrutível de luz divina que habita e sustenta o núcleo íntimo do ser humano."
+  },
+  {
+    "word": "GNOSE",
+    "originalWord": "Gnose / Conhecimento",
+    "translation": "Conhecimento Divino Direto",
+    "description": "O despertar e sabedoria espiritual íntima obtidos não por fé dogmática, mas por experiência vívida."
+  },
+  {
+    "word": "ARCONTE",
+    "originalWord": "Arconte / Controladores",
+    "translation": "Guardiões Planetários",
+    "description": "Entidades ou leis de barreira planetárias descritas no Gnosticismo que guardam os portais celestes."
+  },
+  {
+    "word": "EGREGORA",
+    "originalWord": "Egrégora",
+    "translation": "Forma Pensamento Coletiva",
+    "description": "A entidade ou corpo energético sutil criado pela união concentrada e persistente de pensamentos de um grupo sagrado."
+  },
+  {
+    "word": "CARMA",
+    "originalWord": "Carma / Karma",
+    "translation": "Lei de Causa e Efeito",
+    "description": "Ação ordenadora cósmica irrevogável pela qual cada atitude retorna ao emissor reajustando seus desvios."
+  },
+  {
+    "word": "DHARMA",
+    "originalWord": "Dharma",
+    "translation": "Retidão / Missão de Vida",
+    "description": "O dever e caminho virtuoso harmônico individual de acordo com o plano sutil do Criador."
+  },
+  {
+    "word": "ELEVACAO",
+    "originalWord": "Elevação",
+    "translation": "Refinamento Vibracional",
+    "description": "O ato voluntário de disciplinar e sintonizar os pensamentos em níveis elevados de luz e pureza moral."
+  },
+  {
+    "word": "ILUMINACAO",
+    "originalWord": "Iluminação / Despertar",
+    "translation": "Satori / Sol Central do Eu",
+    "description": "A dissolução definitiva do ego ilusório que unifica o místico com a luz onipresente do Criador Supremo."
+  }
+]

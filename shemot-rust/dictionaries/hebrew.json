@@ -1,0 +1,446 @@
+[
+  {
+    "word": "שלום",
+    "originalWord": "שָׁלוֹם (Shalom)",
+    "translation": "Paz / Integridade",
+    "description": "Bem-estar integral, harmonia espiritual, abundância, integridade e ausência de divisões."
+  },
+  {
+    "word": "אהבה",
+    "originalWord": "אַהֲבָה (Ahavah)",
+    "translation": "Amor / Afeto",
+    "description": "Amor humano e divino; força espiritual que une corações e o criador às suas criaturas."
+  },
+  {
+    "word": "אלוהים",
+    "originalWord": "אֱλֹהִים (Elohim)",
+    "translation": "Deus / Poderes Criativos",
+    "description": "Plural majestático de divindade; representa o Criador justo nos Seus atributos de leis naturais e julgamento."
+  },
+  {
+    "word": "אור",
+    "originalWord": "אוֹר (Or)",
+    "translation": "Luz Primordial",
+    "description": "A primeira manifestação da criação ('Haja Luz'); símbolo de discernimento, revelação e pureza espiritual."
+  },
+  {
+    "word": "רוח",
+    "originalWord": "רוּחַ (Ruach)",
+    "translation": "Espírito / Vento / Sopro",
+    "description": "Sopro de vida animador, vento orientador, ou a presença divina que inspira profetas e sábios."
+  },
+  {
+    "word": "אmet",
+    "originalWord": "אֱמֶת (Emet)",
+    "translation": "Verdade / Selo Divino",
+    "description": "Consistência, solidez absoluta, confiabilidade e a verdade revelada. Considerada o próprio 'selo' de Deus."
+  },
+  {
+    "word": "חכמה",
+    "originalWord": "חָכְמָה (Chokmah)",
+    "translation": "Sabedoria / Emanação",
+    "description": "A segunda Sephirah da Árvore da Vida, representando o ponto original de lampejo criativo sem forma."
+  },
+  {
+    "word": "בינה",
+    "originalWord": "בִּינָה (Binah)",
+    "translation": "Entendimento / Compreensão",
+    "description": "A terceira Sephirah da Árvore da Vida; matriz divina que molda, concebe e organiza as ideias amorfas."
+  },
+  {
+    "word": "כתר",
+    "originalWord": "כֶּתֶר (Keter)",
+    "translation": "Coroa Supremacia",
+    "description": "A Sephirah mais elevada da Árvore da Vida; ponto de contato absoluto com o Infinito ilimitado (Ein Sof)."
+  },
+  {
+    "word": "דעת",
+    "originalWord": "דַּעַת (Da'at)",
+    "translation": "Conhecimento Prático",
+    "description": "A Sephirah invisível que une entendimento e sabedoria em convicção prática e experiência vivida."
+  },
+  {
+    "word": "חסד",
+    "originalWord": "חֶסֶד (Chesed)",
+    "translation": "Misericórdia / Amor Expansivo",
+    "description": "A quarta Sephirah; bondade abundante de dar sem exigências, amor incondicional ativo."
+  },
+  {
+    "word": "גבורה",
+    "originalWord": "גְּבוּרָה (Gevurah)",
+    "translation": "Rigor / Força / Severidade",
+    "description": "A quinta Sephirah; leis restritivas, fronteiras protetoras, rigor moral e julgamento necessário."
+  },
+  {
+    "word": "תפארת",
+    "originalWord": "תִּפְאֶרֶת (Tiferet)",
+    "translation": "Beleza / Harmonia Célere",
+    "description": "A sexta Sephirah; o coração geométrico da Árvore que reconcilia a doação (Chesed) com a restrição (Gevurah)."
+  },
+  {
+    "word": "נצח",
+    "originalWord": "נֵצַח (Netzach)",
+    "translation": "Vitória / Eternidade Ativa",
+    "description": "A sétima Sephirah; persistência vitoriosa, impulsos instintivos de avanço e liderança criativa."
+  },
+  {
+    "word": "הוד",
+    "originalWord": "הוֹד (Hod)",
+    "translation": "Esplendor / Reverência",
+    "description": "A oitava Sephirah; ordem mental lógica, glória reflexiva, recolhimento interior e estética refinada."
+  },
+  {
+    "word": "יסוד",
+    "originalWord": "יְסוֹד (Yesod)",
+    "translation": "Fundamento / Base",
+    "description": "A nona Sephirah; reservatório criativo que conecta os mundos divinos com a expressão material."
+  },
+  {
+    "word": "מלכות",
+    "originalWord": "מַלְכוּת (Malchut)",
+    "translation": "Reino / Manifestação Física",
+    "description": "A décima e última Sephirah; semente física terrena de manifestação, morada viva da Shechinah."
+  },
+  {
+    "word": "אדם",
+    "originalWord": "אָדָם (Adam)",
+    "translation": "Humano / Homem da Terra",
+    "description": "Humanidade, homem espiritual original criado do pó vermelho cultivável e soprado por IHVH."
+  },
+  {
+    "word": "חיים",
+    "originalWord": "חַיִּים (Chayim)",
+    "translation": "Vida abundante",
+    "description": "Estado plural de vitalidade. Contém as energias de subsistência biológica e elevação divina."
+  },
+  {
+    "word": "יהוה",
+    "originalWord": "יהו״ה (YHVH)",
+    "translation": "Tetragrama Inefável",
+    "description": "O Nome Próprio de Deus que abarca passado, presente e futuro em simetria eterna existencial. Não pronunciado por reverência."
+  },
+  {
+    "word": "אדני",
+    "originalWord": "אֲדֹנָי (Adonai)",
+    "translation": "Senhor / Soberano da Criação",
+    "description": "Tratamento de extrema reverência para falar com Deus, servindo como substituto verbal do Tetragrama."
+  },
+  {
+    "word": "ברαשית",
+    "originalWord": "בְּרֵאשִׁית (Bereshit)",
+    "translation": "No Princípio",
+    "description": "A palavra inaugural da Escritura Sagrada judaica; representa a aurora fecunda da matéria tempo-espaço."
+  },
+  {
+    "word": "נשמה",
+    "originalWord": "נְשָׁמָה (Neshamah)",
+    "translation": "Alma Intelectual Superior",
+    "description": "Sopro de alma de altíssimo escalão, centro de discernimento moral refinado e reflexão abstrata."
+  },
+  {
+    "word": "שכינה",
+    "originalWord": "שְׁכִינָה (Shechinah)",
+    "description": "Presença imanente e visível de Deus no mundo sensível. Aspecto maternal receptivo do divino na Kabbalah.",
+    "translation": "Habitação Divina"
+  },
+  {
+    "word": "ישוע",
+    "originalWord": "יֵשׁוּעַ (Yeshua)",
+    "translation": "Salvação / Jesus",
+    "description": "Nome que significa 'Salvação de IHVH'. O redentor e ungido de Nazaré."
+  },
+  {
+    "word": "משיח",
+    "originalWord": "מָשִׁיחַ (Mashiach)",
+    "translation": "Ungido / Messias",
+    "description": "Líder sagrado consagrado com óleos perfumados; libertador profetizado para resgatar os povos."
+  },
+  {
+    "word": "אש",
+    "originalWord": "אֵשׁ (Esh)",
+    "translation": "Fogo Alquímico",
+    "description": "Símbolo de desejo fervente, purificação intensa pelo sofrimento, julgamento e transformação ativa."
+  },
+  {
+    "word": "מים",
+    "originalWord": "מַיִם (Mayim)",
+    "translation": "Água Purificadora",
+    "description": "Símbolo de misericórdia expansiva, sabedoria fluida que desce de alturas celestes, purificação."
+  },
+  {
+    "word": "ארץ",
+    "originalWord": "אֶרֶץ (Eretz)",
+    "translation": "Terra de Manifestação",
+    "description": "Plano material do solo físico, reino de recepção, pátria física da comunidade."
+  },
+  {
+    "word": "שמים",
+    "originalWord": "שָׁמַיִם (Shamayim)",
+    "translation": "Céus Celestiais",
+    "description": "Literalmente 'onde há água/fogo misturados'. Regiões sublimes de morada cósmica divina."
+  },
+  {
+    "word": "אחד",
+    "originalWord": "אֶחָד (Echad)",
+    "translation": "Unidade Absoluta",
+    "description": "A unidade total indivisível de Deus afirmada no dogma central do Shemá Israel."
+  },
+  {
+    "word": "היכל",
+    "originalWord": "הֵיכָל (Heichal)",
+    "translation": "Templo / Palácio",
+    "description": "Santidades arquitetônicas habitadas pela realeza cósmica de Deus, portais de oração."
+  },
+  {
+    "word": "בריאה",
+    "originalWord": "בְּרִיאָה (Beriah)",
+    "translation": "Mundo da Criação",
+    "description": "O segundo mundo da cosmologia kabbalística; plano de criação ideal amparado pelos tronos divinos."
+  },
+  {
+    "word": "אצילות",
+    "originalWord": "אֲצִילוּת (Atzilut)",
+    "translation": "Mundo das Emanações",
+    "description": "O nível supremo cósmico divino de união nítida sem separações egoicas com a Fonte Divina primordial."
+  },
+  {
+    "word": "יצירה",
+    "originalWord": "יְצִירָה (Yetzirah)",
+    "translation": "Mundo da Formação",
+    "description": "O terceiro mundo kabbalístico correspondente às assembleias de anjos ativos guardiões, emoções purificadas."
+  },
+  {
+    "word": "עשייה",
+    "originalWord": "עֲשִׂיָּה (Asiyah)",
+    "translation": "Mundo das Realizações",
+    "description": "O plano físico mais denso de ações purificadoras terrenas que fecham as emanações celestes."
+  },
+  {
+    "word": "קדוש",
+    "originalWord": "קָדוֹΣ (Kadosh)",
+    "translation": "Consagrado / Santo",
+    "description": "Totalmente separado de impurezas profanas, purificado na sua totalidade para finalidades divinas."
+  },
+  {
+    "word": "אינסוף",
+    "originalWord": "אֵין סוֹף (Ein Sof)",
+    "translation": "O Infinito Absoluto",
+    "description": "Deus além de qualquer emanação, contorno ou manifestação palpável. O vazio fecundo inefável sem fim."
+  },
+  {
+    "word": "אריךאנפין",
+    "originalWord": "אֲרִיךְ אַנְפִּין (Arich Anpin)",
+    "translation": "O Rosto Longo / Paciência",
+    "description": "Semblante divino de paciência ilimitada na kabbalah que repousa na fronteira sutil de Keter."
+  },
+  {
+    "word": "זעיראנפין",
+    "originalWord": "זְעֵיר אַנְפִּין (Zeir Anpin)",
+    "translation": "Semblante Menor",
+    "description": "A soma das seis Sephiroth de Chesed a Yesod configurando o canal ativo governante do cosmos visível."
+  },
+  {
+    "word": "אבא",
+    "originalWord": "אַבָּא (Abba)",
+    "translation": "Pai Celestial / Chokmah",
+    "description": "Força cósmica arquetípica ativa masculina paterna associada à centelha de Chokmah."
+  },
+  {
+    "word": "אמא",
+    "originalWord": "אִמָּא (Imma)",
+    "translation": "Mãe Celestial / Binah",
+    "description": "A grande abóbada materna receptiva de Binah que abriga, acolhe e desenvolve as ideias universais."
+  },
+  {
+    "word": "מטטרון",
+    "originalWord": "מֶטָטְרוֹן (Metatron)",
+    "translation": "Metatron / Arcanjo Maior",
+    "description": "Arcanjo do trono divino supremo, chanceler dos reinos celestes e ordenador do plano sutil."
+  },
+  {
+    "word": "סנדלפון",
+    "originalWord": "סַנְדַּלְפוֹן (Sandalphon)",
+    "translation": "Sandalphon / Arcanjo de Malchut",
+    "description": "O colossal anjo da terra que tece as coroas com as preces sinceras humanas e as conduz ao Criador."
+  },
+  {
+    "word": "מיכאל",
+    "originalWord": "מִיכָאֵל (Michael)",
+    "translation": "Miguel / Arcanjo do Fogo",
+    "description": "Aquele como Deus; o defensor celestial da justiça solar e exércitos celestes contra as trevas corporais."
+  },
+  {
+    "word": "גבריאל",
+    "originalWord": "גַּבְרִיאֵל (Gabriel)",
+    "translation": "Gabriel / Arcanjo da Água",
+    "description": "Mensageiro potente de Deus; padroeiro das revelações, intuições, sonhos divinos e anúncios do alto."
+  },
+  {
+    "word": "רפאל",
+    "originalWord": "רָפָאֵל (Raphael)",
+    "translation": "Rafael / Arcanjo do Ar",
+    "description": "Deus Cura; o condutor das energias solares curativas mentais que assiste os enfermos e peregrinos."
+  },
+  {
+    "word": "אוריאל",
+    "originalWord": "אוּרִיאֵל (Uriel)",
+    "translation": "Uriel / Arcanjo da Terra",
+    "description": "Fogo de Deus; o arcanjo da firmeza terrena e inteligência física que orienta profecias."
+  },
+  {
+    "word": "רזיאל",
+    "originalWord": "רָזִיאֵל (Raziel)",
+    "translation": "Raziel / Segredo de Deus",
+    "description": "O anjo sublime guardião das sabedorias arcanas cósmicas que guiou Adão ao segredo da reconciliação."
+  },
+  {
+    "word": "כרובים",
+    "originalWord": "כְּרוּבִים (Cherubim)",
+    "translation": "Querubins / Protetores",
+    "description": "Anjos de força arquetípica que protegem as franjas de manifestação do trono e portais celestiais."
+  },
+  {
+    "word": "שרפים",
+    "originalWord": "שְׂרָפִים (Seraphim)",
+    "translation": "Serafins / Ardentes",
+    "description": "Anjos de fogo celestial devorador cuja louvação ininterrupta mantém as emanações cósmicas ativas."
+  },
+  {
+    "word": "אופנים",
+    "originalWord": "אוֹפַנִּים (Ophanim)",
+    "translation": "Ofanins / Rodas de Fogo",
+    "description": "Rodas angélicas vivas cheias de olhos da visão do carro de Ezequiel que sustentam os palácios terrestres."
+  },
+  {
+    "word": "מרכבה",
+    "originalWord": "מֶרְכָּבָה (Merkavah)",
+    "translation": "Merkavah / Carruagem Celestial",
+    "description": "As meditações e técnicas extáticas de ascensão mística para contemplação do trono de luz supremo."
+  },
+  {
+    "word": "גןעדן",
+    "originalWord": "גַּן עֵדֶן (Gan Eden)",
+    "translation": "Jardim do Éden / Paraíso",
+    "description": "O plano espiritual sublime de contemplação doce sem poluições mundanas."
+  },
+  {
+    "word": "גיהנום",
+    "originalWord": "גֵּיהִנּוֹם (Gehenna)",
+    "translation": "Geena / Cadinho de Purificação",
+    "description": "Região de reajuste transitório espiritual onde as consciências pesadas se desfazem das escórias terrenas."
+  },
+  {
+    "word": "צינורות",
+    "originalWord": "צִינּוֹרוֹת (Tzinorot)",
+    "translation": "Canais da Árvore",
+    "description": "Os 22 caminhos ou canais que conectam as dez Sephiroth na representação da Árvore da Vida."
+  },
+  {
+    "word": "צדיק",
+    "originalWord": "צַדִּיק (Tzadik)",
+    "translation": "O Justo / Pilar da Criação",
+    "description": "A consciência santa integrada que serve como âncora energética mantendo o canal celeste aberto à terra."
+  },
+  {
+    "word": "תורה",
+    "originalWord": "תּוֹרָה (Torah)",
+    "translation": "Leis Divinas / Torá",
+    "description": "Preceitos e ensinamentos sagrados que guiam o caminhar reto do homem nos caminhos divinos."
+  },
+  {
+    "word": "שופר",
+    "originalWord": "שׁוֹפָר (Shofar)",
+    "translation": "Shofar / Corneta de Alarme",
+    "description": "Chifre ritualístico cujo rugido destrói as barreiras mentais, despertando os adormecidos morais."
+  },
+  {
+    "word": "מזל",
+    "originalWord": "מַזָּל (Mazal)",
+    "translation": "Mazal / Fluxo Cósmico",
+    "description": "A semente invisível de destino astrológico influente gotejando diretamente dos céus."
+  },
+  {
+    "word": "שבת",
+    "originalWord": "שַׁבָּת (Shabbat)",
+    "translation": "Shabbat / Repouso Sagrado",
+    "description": "Sétimo dia instituído de recolhimento espiritual total, unindo o místico ao silêncio doce cósmico."
+  },
+  {
+    "word": "שדי",
+    "originalWord": "שַׁדַּי (Shaddai)",
+    "translation": "Deus Todo-Poderoso",
+    "description": "Nome divino de poder que rege as fronteiras e fertilidades do plano de Yesod."
+  },
+  {
+    "word": "אהיה",
+    "originalWord": "אֶהְיֶה (Eheyeh)",
+    "translation": "Eu Serei o que Serei",
+    "description": "O Nome divino de Keter expressando existência indômita, potência pura absoluta e potencialidade infinita."
+  },
+  {
+    "word": "צבאות",
+    "originalWord": "צְבָאוֹת (Tzevaot)",
+    "translation": "Das Legiões",
+    "description": "Nome de Deus sintonizado com os exércitos naturais cósmicos dominantes de Netzach e Hod."
+  },
+  {
+    "word": "חן",
+    "originalWord": "חֵן (Chen)",
+    "translation": "Graça / Mistério Sutil",
+    "description": "Graça, charme ou simpatia mística oculta. Carrega segredos gemátricos profundos."
+  },
+  {
+    "word": "נפש",
+    "originalWord": "נֶפֶשׁ (Nefesh)",
+    "translation": "Nefesh / Alma Vital",
+    "description": "A camada de alma animal básica responsável por governar os instintos físicos de sobrevivência do suporte."
+  },
+  {
+    "word": "חיה",
+    "originalWord": "חַיָּה (Chayah)",
+    "translation": "Chayah / Força Espiritual",
+    "description": "Nível de alma transcendente que abriga a vitalidade integradora espiritual e vontade luminosa."
+  },
+  {
+    "word": "יחידה",
+    "originalWord": "יְחִידָה (Yechidah)",
+    "translation": "Yechidah / Unidade Suprema",
+    "description": "A fagulha divina original intangível que constitui o topo da consciência, unificada com a Fonte."
+  },
+  {
+    "word": "שמש",
+    "originalWord": "שֶׁמֶשׁ (Shemesh)",
+    "translation": "Sol Celeste",
+    "description": "O globo solar vitalizador que espalha energia no plano físico macrocósmico."
+  },
+  {
+    "word": "ירח",
+    "originalWord": "יָרֵחַ (Yareach)",
+    "translation": "Lua de Cera",
+    "description": "O corpo de reflexo e águas sutil do céu que governa os sonhos e ritmos sublunares terrestres."
+  },
+  {
+    "word": "מגןדוד",
+    "originalWord": "מָגֵן דָּוִד (Magen David)",
+    "translation": "Estrela de Seis Pontas / Escudo",
+    "description": "Hexagrama sagrado composto por dois triângulos cruzados personificando o Macrocosmos e o Microcosmos."
+  },
+  {
+    "word": "מנורה",
+    "originalWord": "מְנוֹרָה (Menorah)",
+    "translation": "Candelabro Sagrado",
+    "description": "Símbolo dos sete planetas, sete metais e sete emanações ardentes da inteligência divina."
+  },
+  {
+    "word": "קליפות",
+    "originalWord": "קְלִיפּוֹת (Kliphot)",
+    "translation": "Cascas / Forças Opostas",
+    "description": "Invólucros ou cascas egoicas que geram a ilusão de separação cósmica e retêm a luz pura."
+  },
+  {
+    "word": "ארון",
+    "originalWord": "אָרוֹן (Aron)",
+    "translation": "Arca do Pacto",
+    "description": "O baú de madeira de acácia recoberto de ouro que abrigava as tábuas da aliança no Tabernáculo."
+  }
+]

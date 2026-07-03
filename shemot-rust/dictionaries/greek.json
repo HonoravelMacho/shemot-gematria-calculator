@@ -1,0 +1,482 @@
+[
+  {
+    "word": "ΛΟΓΟΣ",
+    "originalWord": "Λόγος (Logos)",
+    "translation": "Verbo / Razão Divina",
+    "description": "Palavra, discurso, razão lógica, princípio ordenador do universo em Heráclito, na filosofia estoica e no Evangelho de João."
+  },
+  {
+    "word": "ΑΓΑΠΗ",
+    "originalWord": "᾿Αγάπη (Agape)",
+    "translation": "Amor Incondicional",
+    "description": "O tipo mais elevado de amor, de natureza puramente espiritual, benevolente e altruísta."
+  },
+  {
+    "word": "ΘΕΟΣ",
+    "originalWord": "Θεός (Theos)",
+    "translation": "Deus / Divindade",
+    "description": "Designação de Deus ou de um ser divino. Origem cósmica de toda a criação."
+  },
+  {
+    "word": "ΠΝΕΥΜΑ",
+    "originalWord": "Πνεῦμα (Pneuma)",
+    "translation": "Espírito / Sopro",
+    "description": "Sopro de vida, vento invisível, espírito humano ou o Espírito Santo na teologia bíblica."
+  },
+  {
+    "word": "ΑΛΗΘΕΙΑ",
+    "originalWord": "᾿Αλήθεια (Aletheia)",
+    "translation": "Verdade / Revelação",
+    "description": "Literalmente 'o desvelamento' ou 'não-esquecimento'. O estado de realidade exposta e verdadeira."
+  },
+  {
+    "word": "ΖΩΗ",
+    "originalWord": "Ζωή (Zoe)",
+    "translation": "Vida Essencial",
+    "description": "Princípio vital, a vida na sua essência absoluta e divina, distinta de bíos (vida biológica/biografia)."
+  },
+  {
+    "word": "ΦΩΣ",
+    "originalWord": "Φῶς (Phos)",
+    "translation": "Luz / Iluminação",
+    "description": "Luz física ou espiritual, símbolo de pureza, conhecimento divino e glória imperecível."
+  },
+  {
+    "word": "ΚΟΣΜΟΣ",
+    "originalWord": "Κόσμος (Kosmos)",
+    "translation": "Mundo / Ordem Cósmica",
+    "description": "O universo criado, visto como um sistema ordenado, belo e harmonioso contraposto ao Caos."
+  },
+  {
+    "word": "ΣΟΦΙΑ",
+    "originalWord": "Σοφία (Sophia)",
+    "translation": "Sabedoria Divina",
+    "description": "Conhecimento profundo dos mistérios celestes ou práticos. Personificada como emanação divina nas correntes gnósticas."
+  },
+  {
+    "word": "ΝΟΜΟΣ",
+    "originalWord": "Νόμος (Nomos)",
+    "translation": "Lei / Costume",
+    "description": "Lei, estatuto ou regra divina ou humana que rege o comportamento de um povo ou do universo."
+  },
+  {
+    "word": "ΧΑΡΙΣ",
+    "originalWord": "Χάρις (Charis)",
+    "translation": "Graça / Favor",
+    "description": "Favor imerecido, benefício gratuito, beleza graciosa ou dom espiritual concedido pelo divino."
+  },
+  {
+    "word": "ΕΙΡΗΝΗ",
+    "originalWord": "Εἰρήνη (Eirene)",
+    "translation": "Paz / Harmonia",
+    "description": "Estado de reconciliação, tranquilidade da alma e bem-estar comunitário sob a benção divina."
+  },
+  {
+    "word": "ΠΙΣΤΙΣ",
+    "originalWord": "Πίστις (Pistis)",
+    "translation": "Fé / Confiança",
+    "description": "Fé teológica, fidelidade, confiança irrestrita na palavra divina ou em compromissos espirituais."
+  },
+  {
+    "word": "ΓΝΩΣΙΣ",
+    "originalWord": "Γνῶσις (Gnosis)",
+    "translation": "Conhecimento Místico",
+    "description": "Conhecimento existencial e intuitivo do divino por revelação interior direta, central no Gnosticismo."
+  },
+  {
+    "word": "ΚΥΡΙΟΣ",
+    "originalWord": "Κύριος (Kyrios)",
+    "translation": "Senhor / Governante",
+    "description": "Aquele que possui autoridade suprema, mestre, senhor de escravos ou o próprio Deus da aliança."
+  },
+  {
+    "word": "ΝΟΥΣ",
+    "originalWord": "Νοῦς (Nous)",
+    "translation": "Intelecto / Mente Espiritual",
+    "description": "Faculdade suprema de entendimento direto e contemplação das ideias espirituais/formas inteligíveis segundo o Platonismo."
+  },
+  {
+    "word": "ΕΙΔΟΣ",
+    "originalWord": "Εἶδος (Eidos)",
+    "translation": "Ideia / Essência Formativa",
+    "description": "Forma primordial, arquétipo abstrato que molda a matéria sensível no pensamento platônico."
+  },
+  {
+    "word": "ΑΡΧΗ",
+    "originalWord": "᾿Αρχή (Arche)",
+    "translation": "Origem / Princípio Ativo",
+    "description": "Causa elementar original de onde procedem todas as forças cósmicas e substâncias."
+  },
+  {
+    "word": "ΨΥΧΗ",
+    "originalWord": "Ψυχή (Psyche)",
+    "translation": "Alma / Vento da Vida",
+    "description": "Alma imaterial, morada das emoções individuais, personalidade e centro da vida senciente."
+  },
+  {
+    "word": "ΧΡΙΣΤΟΣ",
+    "originalWord": "Χριστός (Christos)",
+    "translation": "Ungido / Salvador",
+    "description": "Aquele que recebeu a unção ritual sagrada; o Messias encarnado na tradição cristã."
+  },
+  {
+    "word": "ΑΓΓΕΛΟΣ",
+    "originalWord": "῎Αγγελος (Angelos)",
+    "translation": "Mensageiro / Anjo",
+    "description": "Enviado de Deus para comunicar visões, ordens, profecias ou para atuar como guardião."
+  },
+  {
+    "word": "ΕΚΚΛΗΣΙΑ",
+    "originalWord": "᾿Εκκλησία (Ekklesia)",
+    "translation": "Assembleia / Congregação",
+    "description": "Reunião de cidadãos chamados para fora (ek-kaleo) para deliberar; a assembleia dos santos."
+  },
+  {
+    "word": "ΜΥΣΤΗΡΙΟΝ",
+    "originalWord": "Μυστήριον (Mysterion)",
+    "translation": "Mistério / Segredo",
+    "description": "Segredo espiritual oculto, rituais reservados apenas para iniciados nos mistérios antigos."
+  },
+  {
+    "word": "ΕΛΠΙΣ",
+    "originalWord": "᾿Ελπίς (Elpis)",
+    "translation": "Esperança",
+    "description": "Expectativa confiante no cumprimento de promessas benéficas futuras."
+  },
+  {
+    "word": "ΔΙΚΑΙΟΣΥΝΗ",
+    "originalWord": "Δικαιοσύνη (Dikaiosyne)",
+    "translation": "Justiça / Retidão",
+    "description": "Qualidade moral de quem cumpre a justiça essencial cotidiana e espiritual."
+  },
+  {
+    "word": "ΤΕΛΟΣ",
+    "originalWord": "Τέλος (Telos)",
+    "translation": "Propósito / Fim",
+    "description": "Meta final, consumação perfeita, término ou objetivo último da vida ou do cosmo."
+  },
+  {
+    "word": "ΚΑΡΔΙΑ",
+    "originalWord": "Καρδία (Kardia)",
+    "translation": "Coração / Centro Íntimo",
+    "description": "Sede física da vitalidade e centro metafórico das decisões espirituais, pensamentos e desejos humanos."
+  },
+  {
+    "word": "ΑΙΩΝ",
+    "originalWord": "Αἰών (Aion)",
+    "translation": "Era / Eternidade",
+    "description": "Período temporal vastíssimo, ciclo cósmico ou a própria duração eterna além das amarras temporais."
+  },
+  {
+    "word": "ΥΙΟΣ",
+    "originalWord": "Υἱός (Huios)",
+    "translation": "Filho",
+    "description": "Aquele originado legitimamente das linhagens da família ou gerado no Espírito."
+  },
+  {
+    "word": "ΠΑΤΗΡ",
+    "originalWord": "Πατήρ (Pater)",
+    "translation": "Pai / Criador originário",
+    "description": "Aquele que gera, cuida, cria ou estabelece fundamentos e linhagens espirituais."
+  },
+  {
+    "word": "ΒΑΣΙΛΕΙΑ",
+    "originalWord": "Βασιλεία (Basileia)",
+    "translation": "Reino / Domínio",
+    "description": "Autoridade governamental régia de um monarca; o Reino de Deus manifestado sobre a terra."
+  },
+  {
+    "word": "ΜΟΝΑΧΟΣ",
+    "originalWord": "Μοναχός (Monachos)",
+    "translation": "Monge / Unificado",
+    "description": "Solitário, aquele que vive in solitário de isolamento místico para dedicação exclusiva ao divino."
+  },
+  {
+    "word": "ΚΑΘΑΡΣΙΣ",
+    "originalWord": "Κάθαρσις (Katharsis)",
+    "translation": "Purificação",
+    "description": "Expulsão ritualística de substâncias poluentes, purificação das emoções ou liberação de detritos da mente."
+  },
+  {
+    "word": "ΧΑΟΣ",
+    "originalWord": "Χάος (Chaos)",
+    "translation": "Caos / Vazio Primordial",
+    "description": "O vazio informe e abissal que antecedeu a criação organizada e geométrica do universo."
+  },
+  {
+    "word": "ΔΥΝΑΜΙΣ",
+    "originalWord": "Δύναμις (Dynamis)",
+    "translation": "Poder / Potencialidade",
+    "description": "Força latente, poder de milagres ou capacidade energética para agir fisicamente e metafisicamente."
+  },
+  {
+    "word": "ΣΩΤΗΡ",
+    "originalWord": "Σωτήρ (Soter)",
+    "translation": "Salvador / Libertador",
+    "description": "Aquele que livra de apuros agudos, preserva do perigo, cura enfermidades profundas ou provê salvação divina."
+  },
+  {
+    "word": "ΑΒΡΑΞΑΣ",
+    "originalWord": "᾿Αβράξας (Abraxas)",
+    "translation": "Abraxas / Deus Gnóstico",
+    "description": "Arconte gnóstico cuja soma gemátrica é exatamente 365, simbolizando as esferas celestiais e os ciclos temporais terrestres."
+  },
+  {
+    "word": "ΑΛΦΑ",
+    "originalWord": "῎Αλφα (Alpha)",
+    "translation": "Alfa / Início",
+    "description": "A primeira letra do alfabeto grego, símbolo do ponto zero cósmico e do amanhecer criativo divino."
+  },
+  {
+    "word": "ΩΜΕΓΑ",
+    "originalWord": "῏Ωμέγα (Omega)",
+    "translation": "Ômega / Consumação",
+    "description": "A última letra do alfabeto grego, representando o encerramento do ciclo temporal e a reintegração com o Absoluto."
+  },
+  {
+    "word": "ΔΙΑΒΟΛΟΣ",
+    "originalWord": "Διάβολος (Diabolos)",
+    "translation": "Caluniador / Divisor",
+    "description": "Aquele que separa, acusa ou espalha a discórdia moral, contrapondo-se à harmonia do Logos ordenador."
+  },
+  {
+    "word": "ΑΔΑΜ",
+    "originalWord": "᾿Αδάμ (Adam)",
+    "translation": "Adão Primordial",
+    "description": "O humano arquetípico inicial cujas letras simbolizam os quatro cantos cósmicos: Anatole, Dysis, Arktos, Mesembria."
+  },
+  {
+    "word": "ΔΗΜΙΟΥΡΓΟΣ",
+    "originalWord": "Δημιουργός (Demiourgos)",
+    "translation": "Demiurgo / Arquiteto Físico",
+    "description": "O artesão ou criador das formas materiais; divindade menor ou cega no Gnosticismo, arquiteto das leis físicas na cosmologia platônica."
+  },
+  {
+    "word": "ΕΡΩΣ",
+    "originalWord": "῎Ερως (Eros)",
+    "translation": "Amor Magnético / Eros",
+    "description": "A força divina irresistível de união cósmica, desejo sagrado e atração mútua que move as partículas elementares."
+  },
+  {
+    "word": "ΘΕΟΤΗΣ",
+    "originalWord": "Θεότης (Theotes)",
+    "translation": "Divindade Absoluta",
+    "description": "A qualidade superlativa e essência própria de ser Deus, transcendendo qualquer representação conceitual terrena."
+  },
+  {
+    "word": "ΜΟΝΑΣ",
+    "originalWord": "Μονάς (Monas)",
+    "translation": "Mônada / Unidade Singular",
+    "description": "O princípio pitagórico e hermético de unidade inquebrável, fonte invisível e semente geométrica de todos os números."
+  },
+  {
+    "word": "ΤΡΙΑΣ",
+    "originalWord": "Τριάς (Trias)",
+    "translation": "Tríade / Divina Trindade",
+    "description": "O primeiro desdobramento harmônico da unidade original; a representação triangular das dinâmicas universais de tese, antítese e síntese."
+  },
+  {
+    "word": "ΥΛΗ",
+    "originalWord": "῞Υλη (Hyle)",
+    "translation": "Matéria Primordial",
+    "description": "A matriz caótica passiva e sem forma que serve como solo sobre o qual o sopro do Logos modela os planos tangíveis."
+  },
+  {
+    "word": "ΓΕΩΜΕΤΡΙΑ",
+    "originalWord": "Γεωμετρία (Geometria)",
+    "translation": "Medida da Terra (Geometria)",
+    "description": "O estudo das ordens matemáticas e relações perfeitas das formas cósmicas usadas pelo Grande Criador na obra."
+  },
+  {
+    "word": "ΚΕΝΩΣΙΣ",
+    "originalWord": "Κένωσις (Kenosis)",
+    "translation": "Kenose / Esvaziamento",
+    "description": "Doutrina mística de esvaziamento do ego individual ou da auto-glória em humildade absoluta para habitação do Espírito Divino."
+  },
+  {
+    "word": "ΜΕΤΑΝΟΙΑ",
+    "originalWord": "Μετάνοια (Metanoia)",
+    "translation": "Transmutação de Consciência",
+    "description": "Arrependimento profundo que opera uma mudança drástica de direção mental e abertura dos canais sutis."
+  },
+  {
+    "word": "ΠΛΗΡΩΜΑ",
+    "originalWord": "Πλήρωμα (Pleroma)",
+    "translation": "Pleroma / Plenitude Celestial",
+    "description": "O reino celestial de eterna luz pura espiritual que congrega os Éons divinos e emanações inteligíveis no Gnosticismo."
+  },
+  {
+    "word": "ΑΝΘΡΩΠΟΣ",
+    "originalWord": "῎Ανθρωπος (Anthropos)",
+    "translation": "Ser Humano / Antropos",
+    "description": "Aquele cuja natureza o vocaciona a olhar para o alto. Tipo ideal de humanidade criado à imagem das emanações sagradas."
+  },
+  {
+    "word": "ΜΥΣΤΗΣ",
+    "originalWord": "Μύστης (Mystes)",
+    "translation": "Iniciado dos Templos",
+    "description": "Aquele que foi admitido e instruído nos mistérios sagrados ocultos do universo, recebendo o segredo do renascimento."
+  },
+  {
+    "word": "ΝΕΚΡΟΣ",
+    "originalWord": "Νεκρός (Nekros)",
+    "translation": "Invólucro Desprovido de Vida",
+    "description": "O corpo inanimado e denso após o desprendimento das frações imateriais no ato da transição da alma."
+  },
+  {
+    "word": "ΣΤΑΥΡΟΣ",
+    "originalWord": "Σταυρός (Stauros)",
+    "translation": "Cruz / Eixo Cósmico",
+    "description": "Símbolo ancestral geométrico que cruza a linha de evolução horizontal material com o prumo ascensional vertical espiritual."
+  },
+  {
+    "word": "ΧΕΙΡ",
+    "originalWord": "Χείρ (Cheir)",
+    "translation": "Mão / Força Ativa",
+    "description": "Mão como instrumento de emanação energética, bênção ritualística ou projeção da vontade."
+  },
+  {
+    "word": "ΚΛΕΙΣ",
+    "originalWord": "Κλείς (Kleis)",
+    "translation": "Chave Iniciática",
+    "description": "Símbolo de autoridade real para abrir os arcanos ocultos e desvelar segredos selados para olhos profanos."
+  },
+  {
+    "word": "ΜΟΝΟΓΕΝΗΣ",
+    "originalWord": "Μονογενής (Monogenes)",
+    "translation": "Filho Unigênito",
+    "description": "Emanação direta singular do seio inefável do Pai Eterno que reflete plenamente a glória pura do Absoluto."
+  },
+  {
+    "word": "ΠΕΤΡΑ",
+    "originalWord": "Πέτρα (Petra)",
+    "translation": "Rocha / Pedra Fundamental",
+    "description": "Símbolo da estabilidade iniciática, do lar espiritual inabalável ou da própria Pedra Filosofal dos alquimistas."
+  },
+  {
+    "word": "ΠΥΡ",
+    "originalWord": "Πῦρ (Pyr)",
+    "translation": "Fogo Alquímico",
+    "description": "Elemento de calor, purificação, destruição construtiva e ascensão vibratória de todas as substâncias pesadas."
+  },
+  {
+    "word": "ΥΔΩΡ",
+    "originalWord": "῞Υδωρ (Hydor)",
+    "translation": "Água Sutil",
+    "description": "Matriz passiva de recepção e consolidação; elemento de memórias e regeneração pelo batismo místico."
+  },
+  {
+    "word": "ΓΗ",
+    "originalWord": "Γῆ (Ge)",
+    "translation": "Terra / Mãe Física",
+    "description": "Elemento material mais denso que serve como base física e laboratório experimental para ascensão espiritual."
+  },
+  {
+    "word": "ΑΗΡ",
+    "originalWord": "᾿Αήρ (Aer)",
+    "translation": "Ar Atmosférico",
+    "description": "Elemento intermediário invisível indispensável para circulação do pneuma de respiração e vitalidade terrena."
+  },
+  {
+    "word": "ΑΙΘΗΡ",
+    "originalWord": "Αἰθήρ (Aither)",
+    "description": "A quinta essência sutil dos céus superiores, fluído luminoso imperecível que anima as esferas astras.",
+    "translation": "Éter / Quinta Essência"
+  },
+  {
+    "word": "ΚΥΚΛΟΣ",
+    "originalWord": "Κύκλος (Kyklos)",
+    "translation": "Círculo / Roda Eterna",
+    "description": "Figura geométrica sem princípio nem término que emblema a natureza infinita, ciclos e periodicidades de Deus."
+  },
+  {
+    "word": "ΠΑΡΑΔΕΙΣΟΣ",
+    "originalWord": "Παράδεισος (Paradeisos)",
+    "translation": "O Paraíso Arquétipo",
+    "description": "O jardim ideal cósmico de comunhão pura sem sofrimento onde as consciências puras habitam."
+  },
+  {
+    "word": "ΑΝΑΣΤΑΣΙΣ",
+    "originalWord": "᾿Ανάστασις (Anastasis)",
+    "translation": "Despertar / Ressurreição",
+    "description": "O ato místico de levantar-se e transcender o torpor material, ressuscitando em corpo puro espiritual."
+  },
+  {
+    "word": "ΗΛΙΟΣ",
+    "originalWord": "῞Ηλιος (Helios)",
+    "translation": "Sol / Coração Celeste",
+    "description": "Estrela central radiante, representante visível da luz de Deus e doador diário de forças crísticas."
+  },
+  {
+    "word": "ΣΕΛΗΝΗ",
+    "originalWord": "Σελήνη (Selene)",
+    "translation": "Lua / Mente Reflexiva",
+    "description": "O astro satélite receptivo que recolhe as forças solares e as irradia de forma suave e instintiva nos ciclos lunares."
+  },
+  {
+    "word": "ΑΣΤΗΡ",
+    "originalWord": "᾿Αστήρ (Aster)",
+    "translation": "Estrela / Bússola Celeste",
+    "description": "Ponto cintilante guia das esferas superiores cujas influências regem e inspiram viajantes na jornada."
+  },
+  {
+    "word": "ΜΑΓΟΣ",
+    "originalWord": "Μάγος (Magos)",
+    "translation": "Rei Mago / Monarca Sábio",
+    "description": "Sacerdote das estrelas, astrólogo e sábio cujos conhecimentos dominam as forças ocultas da natureza."
+  },
+  {
+    "word": "ΕΥΑΓΓΕΛΙΟΝ",
+    "originalWord": "Εὐαγγέλιον (Euangelion)",
+    "translation": "Evangelho / Boas Novas",
+    "description": "A revelação e boas notícias do advento do Reino espiritual libertador trazida por emissários divinos."
+  },
+  {
+    "word": "ΕΥΧΑΡΙΣΤΙΑ",
+    "originalWord": "Εὐχαριστία (Eucharistia)",
+    "translation": "Eucaristia / Ação de Graças",
+    "description": "Ritual sagrado de comunhão com o corpo crístico de energia, expressando rendição total de graças."
+  },
+  {
+    "word": "ΠΡΩΤΟΤΟΚΟΣ",
+    "originalWord": "Πρωτότοκος (Prototokos)",
+    "translation": "Primogênito Arquétipo",
+    "description": "A primeira emanação inteligente a romper os véus da manifestação, modelo ideal dos criados."
+  },
+  {
+    "word": "ΔΟΞΑ",
+    "originalWord": "Δόξα (Doxa)",
+    "translation": "Glória / Esplendor Celeste",
+    "description": "Qualidade radiante de esplendor majestoso que circunda os seres santos e os tronos da divindade."
+  },
+  {
+    "word": "ΚΑΛΟΣ",
+    "originalWord": "Καλός (Kalos)",
+    "translation": "O Belo Iniciático",
+    "description": "Harmonia estética superior que transcende a beleza mundana por carregar a virtude do espírito."
+  },
+  {
+    "word": "ΑΓΑΘΟΣ",
+    "originalWord": "᾿Αγαθός (Agathos)",
+    "translation": "O Bem / Virtuoso",
+    "description": "A qualidade existencial moral do que é intrinsecamente proveitoso, puro, útil e alinhado com a Ordem Cósmica."
+  },
+  {
+    "word": "ΣΩΜΑ",
+    "originalWord": "Σῶμα (Soma)",
+    "translation": "Templo Físico / Corpo",
+    "description": "O sarcófago ou roupagem temporária material que enclausura e permite a evolução da alma na terra."
+  },
+  {
+    "word": "ΟΝΟΜΑ",
+    "originalWord": "῎Ονομα (Onoma)",
+    "translation": "Identidade Sagrada / Nome",
+    "description": "A assinatura acústica vibracional e vibratória que define e contém as propriedades essenciais de um ser."
+  },
+  {
+    "word": "ΠΑΝ",
+    "originalWord": "Πάν (Pan)",
+    "translation": "O Todo Cósmico",
+    "description": "O universo absoluto unificado em todas as suas esferas; a personificação dos mistérios da natureza inteira."
+  }
+]

@@ -8,6 +8,7 @@ pub mod rules_latin;
 pub mod rules_greek;
 pub mod rules_hebrew;
 pub mod search;
+pub mod dictionaries;
 
 // Re-export core items for clean external access
 pub use alphabets::valor_letra_latino;
@@ -24,4 +25,9 @@ pub use rules_hebrew::{
 pub use search::{
     backtrack_latino_etimologico, backtrack_latino_custom,
     backtrack_hebraico, backtrack_grego, WildcardSpec,
+};
+pub use dictionaries::{
+    Dictionary, DictionaryEntry, InMemoryDictionary, DictionaryManager,
+    load_default_portuguese_dictionary, load_default_greek_dictionary,
+    load_default_hebrew_dictionary,
 };
