@@ -12,4 +12,4 @@ tauri-build = { version = "1.5" }
 tauri = { version = "1.6", features = ["shell-open"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-gematria = { path = "../shemot-rust" }
+gematria = { package = "shemot", path = "../shemot-rust" }
