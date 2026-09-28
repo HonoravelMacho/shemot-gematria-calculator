@@ -19,9 +19,9 @@ use gematria::{
 };
 
 fn main() {
-    println!("{}", "=====================================================================".bright_amber());
+    println!("{}", "=====================================================================".bright_yellow());
     println!("{}", "          🕯️  SHEMOT GEMATRIA & OFFLINE DICTIONARIES (RUST) 🕯️         ".bright_yellow().bold());
-    println!("{}", "=====================================================================".bright_amber());
+    println!("{}", "=====================================================================".bright_yellow());
     println!("{}", "Fase 3: Leitura de arquivos e dicionários offline integrada na memória!".cyan());
     println!("{}", "Carregamento modular e filtragem instantânea ativada.".green());
     println!();
@@ -35,7 +35,7 @@ fn main() {
     println!("Dicionário Português: {} termos carregados", dict_manager.portuguese.list_words().len().to_string().bright_green().bold());
     println!("Dicionário Grego (Koiné): {} termos carregados", dict_manager.greek.list_words().len().to_string().bright_green().bold());
     println!("Dicionário Hebraico: {} termos carregados", dict_manager.hebrew.list_words().len().to_string().bright_green().bold());
-    println!("Tempo de Inicialização & Parsing JSON: {:?}", dict_duration.bright_green());
+    println!("Tempo de Inicialização & Parsing JSON: {}", format!("{:?}", dict_duration).bright_green());
     println!();
 
     let cancel_flag = Arc::new(AtomicBool::new(false));
@@ -194,7 +194,7 @@ fn main() {
     }
     println!();
 
-    println!("{}", "=====================================================================".bright_amber());
+    println!("{}", "=====================================================================".bright_yellow());
     println!("{}", "✨ SUCESSO: Fase 3 Concluída! Dicionários Integrados na Memória! ✨".bright_green().bold());
-    println!("{}", "=====================================================================".bright_amber());
+    println!("{}", "=====================================================================".bright_yellow());
 }

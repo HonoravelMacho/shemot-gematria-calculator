@@ -58,7 +58,7 @@ jobs:
         run: npm ci
 
       - name: Build and Publish Release Artifacts
-        uses: tauri-apps/tauri-action@v2
+        uses: tauri-apps/tauri-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -140,14 +140,24 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
 
-      - name: Install Android NDK
+      - name: Setup Android NDK (usa pré-instalado do runner se houver)
         run: |
-          sdkmanager "platform-tools" "platforms;android-34" "ndk;27.0.12077973"
-          NDK_DIR="$ANDROID_HOME/ndk/27.0.12077973"
-          echo "NDK_HOME=$NDK_DIR" >> "$GITHUB_ENV"
-          echo "ANDROID_NDK_HOME=$NDK_DIR" >> "$GITHUB_ENV"
-          "$NDK_DIR/ndk-build" --version 2>&1 | head -n 2 || true
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+          ls "$ANDROID_HOME/ndk" 2>/dev/null || true
+          if [ -n "${ANDROID_NDK_HOME:-}" ] && [ -d "$ANDROID_NDK_HOME" ]; then
+            echo "NDK pré-instalado: $ANDROID_NDK_HOME"
+            echo "NDK_HOME=$ANDROID_NDK_HOME" >> "$GITHUB_ENV"
+          else
+            sdkmanager "ndk;27.0.12077973"
+            NDK_DIR="$ANDROID_HOME/ndk/27.0.12077973"
+            echo "NDK_HOME=$NDK_DIR" >> "$GITHUB_ENV"
+            echo "ANDROID_NDK_HOME=$NDK_DIR" >> "$GITHUB_ENV"
+          fi
 
       - name: Install frontend dependencies
         run: npm ci
