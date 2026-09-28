@@ -10,7 +10,7 @@ import {
   Book, Search, Copy, Check, Info, Square
 } from "lucide-react";
 import { AlphabetType, LatinoEstilo, LatinoAvancado, SearchStats } from "../types";
-import { invokeSearch, invokeCancel, listenProgress, isTauriRuntime } from "../lib/tauri";
+import { invokeSearch, invokeCancel, listenProgress, isTauriRuntime, saveTextFileNative } from "../lib/tauri";
 import { 
   GREEK_DICTIONARY, 
   HEBREW_DICTIONARY, 
@@ -1505,13 +1505,17 @@ export default function GematriaCalculator() {
     ? realWordsList.map(m => m.originalString)
     : results;
 
-  const handleDownloadResults = () => {
-    if (displayedResults.length === 0) return;
-    
-    let contentToSave = "";
+  // Export status feedback (desktop dialog / Android save / fallback)
+  const [exportMsg, setExportMsg] = useState<string | null>(null);
+  const [showExportModal, setShowExportModal] = useState<boolean>(false);
+  const [exportText, setExportText] = useState<string>("");
+
+  const buildExportContent = (): { filename: string; content: string } => {
+    const filename = `shemot_${alphabet.toLowerCase()}_${targetValue}_filtered.txt`;
+    let content = "";
     if (outputFormat === "pure") {
       // Formato puro de Kislev: apenas as palavras (uma por linha) sem valores ou cabeçalhos
-      contentToSave = displayedResults.map(r => {
+      content = displayedResults.map(r => {
         // Se for grego ou hebraico e tiver transliteração no formato "ΑΒΓ (ABG)", guardamos apenas a palavra grega/hebraica
         if ((alphabet === AlphabetType.Grego || alphabet === AlphabetType.Hebraico) && r.includes(" (")) {
           return r.split(" (")[0];
@@ -1520,7 +1524,7 @@ export default function GematriaCalculator() {
       }).join("\n");
     } else {
       const headerLine = `SHEMOT - BUSCA DE GEMATRIA VALOR ${targetValue} (${dictionaryFilterMode === "all" ? "Todas as combinações" : "Dicionário Offline"})\n====================================\n`;
-      contentToSave = headerLine + displayedResults.map(r => {
+      content = headerLine + displayedResults.map(r => {
         if (dictionaryFilterMode === "words-meanings") {
           const match = findDictionaryEntry(r, alphabet);
           if (match) {
@@ -1530,14 +1534,72 @@ export default function GematriaCalculator() {
         return `${r} = ${targetValue}`;
       }).join("\n");
     }
+    return { filename, content };
+  };
 
-    const blob = new Blob([contentToSave], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `shemot_${alphabet.toLowerCase()}_${targetValue}_filtered.txt`;
-    link.click();
-    URL.revokeObjectURL(url);
+  const copyToClipboard = async (text: string): Promise<boolean> => {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      try {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        const ok = document.execCommand("copy");
+        document.body.removeChild(ta);
+        return ok;
+      } catch {
+        return false;
+      }
+    }
+  };
+
+  const handleDownloadResults = async () => {
+    if (displayedResults.length === 0) return;
+    setExportMsg(null);
+
+    const { filename, content: contentToSave } = buildExportContent();
+
+    // 1) Runtime Tauri (desktop + Android): salvamento nativo.
+    //    No Android o WebView não suporta <a download>, então gravamos
+    //    via plugin-fs (Downloads, com fallback para a pasta do app).
+    if (isTauriRuntime()) {
+      const res = await saveTextFileNative(filename, contentToSave);
+      if (res.ok) {
+        setExportMsg(`Arquivo salvo em: ${res.path}`);
+        return;
+      }
+      if (res.error !== "cancelado pelo usuário") {
+        // Falha nativa (ex.: permissão): oferece o texto para copiar.
+        setExportText(contentToSave);
+        setShowExportModal(true);
+        setExportMsg("Não foi possível salvar o arquivo — copie o texto abaixo.");
+        return;
+      }
+      return;
+    }
+
+    // 2) Navegador comum: download via Blob (funciona no desktop/web).
+    try {
+      const blob = new Blob([contentToSave], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      setExportMsg("Download iniciado no navegador.");
+    } catch {
+      setExportText(contentToSave);
+      setShowExportModal(true);
+    }
   };
 
   return (
@@ -2374,13 +2436,20 @@ export default function GematriaCalculator() {
             {results.length > 0 && (
               <button
                 onClick={handleDownloadResults}
-                className="text-[11px] text-neutral-400 hover:text-white flex items-center gap-1 cursor-pointer bg-neutral-950 border border-neutral-800 px-2 py-1 rounded"
+                className="text-[11px] min-h-[44px] text-neutral-400 hover:text-white flex items-center gap-1 cursor-pointer bg-neutral-950 border border-neutral-800 px-2 py-1 rounded"
               >
                 <Download className="h-3 w-3" />
                 Salvar resultados (.txt)
               </button>
             )}
           </div>
+
+          {/* Export feedback (caminho salvo / instruções Android) */}
+          {exportMsg && (
+            <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 text-[11px] text-amber-300 font-mono break-all">
+              {exportMsg}
+            </div>
+          )}
 
           {/* Sub Header / Tabs for Dictionary Filter */}
           {results.length > 0 && (
@@ -2497,6 +2566,44 @@ export default function GematriaCalculator() {
         </div>
 
       </div>
+
+      {/* Export fallback modal (Android sem acesso a Downloads): texto + copiar */}
+      {showExportModal && (
+        <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/70 p-3" onClick={() => setShowExportModal(false)}>
+          <div
+            className="w-full max-w-2xl bg-neutral-900 border border-neutral-700 rounded-2xl p-4 sm:p-5 space-y-3 max-h-[85dvh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h4 className="text-sm font-bold text-white font-display">Exportar resultados</h4>
+            <p className="text-[11px] text-neutral-400 leading-relaxed">
+              {exportMsg ?? "Copie o texto abaixo e cole no seu app de notas."}
+            </p>
+            <textarea
+              readOnly
+              value={exportText}
+              className="w-full flex-1 min-h-[200px] bg-neutral-950 border border-neutral-800 rounded-xl p-3 text-xs font-mono text-neutral-200 outline-none resize-y"
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={async () => {
+                  const ok = await copyToClipboard(exportText);
+                  setExportMsg(ok ? "Texto copiado! Cole no seu app de notas." : "Falha ao copiar — selecione o texto manualmente.");
+                }}
+                className="flex-1 min-h-[48px] bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold rounded-xl text-sm flex items-center justify-center gap-2"
+              >
+                <Copy className="h-4 w-4" />
+                Copiar tudo
+              </button>
+              <button
+                onClick={() => setShowExportModal(false)}
+                className="min-h-[48px] px-5 bg-neutral-800 hover:bg-neutral-700 text-white font-semibold rounded-xl text-sm"
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
