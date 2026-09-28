@@ -1,6 +1,6 @@
 [package]
 name = "shemot"
-version = "1.0.11"
+version = "1.0.12"
 edition = "2021"
 authors = ["Tiago Rabelo Sels"]
 description = "SHEMOT - High-performance Gematria Search Engine in Rust"

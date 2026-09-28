@@ -217,6 +217,9 @@ export default function GematriaCalculator() {
   // Locked/Fixed letters e.g. "1A,3A"
   const [fixedLettersInput, setFixedLettersInput] = useState<string>("");
 
+  // Letras obrigatórias em qualquer posição livre e.g. "R" ou "R,T"
+  const [requiredLettersInput, setRequiredLettersInput] = useState<string>("");
+
   // Estilísticas
   const [useEstilo, setUseEstilo] = useState<boolean>(false);
   const [estilo, setEstilo] = useState<LatinoEstilo>({
@@ -893,6 +896,7 @@ export default function GematriaCalculator() {
           radical,
           modoRadical,
           fixedLettersInput,
+          requiredLettersInput,
           useEstilo,
           minV: estilo.minV,
           maxV: estilo.maxV,
@@ -1069,7 +1073,21 @@ export default function GematriaCalculator() {
           }
         }
 
-        // BACKTRACKING DFS para máxima velocidade na filtragem com poda matemática de peso e fonética ativada
+        // BACKTRACKING DFS para máxima velocidade na filtragem com poda matemática de peso e fonética ativada.
+        // Não-palíndromo: prefixo no início, sufixo no fim, radical centralizado
+        // (centro ideal ±1 posição; prefixo longo empurra p/ direita, sufixo longo p/ esquerda).
+        const minStart = pfx.length;
+        const maxStart = totalLength - sfx.length - rad.length;
+        let radStarts: number[];
+        if (rad.length === 0) {
+          radStarts = [minStart];
+        } else {
+          const ideal = Math.floor((totalLength - rad.length) / 2);
+          const cand = [ideal - 1, ideal, ideal + 1].filter(s => s >= minStart && s <= maxStart);
+          const uniq = [...new Set(cand)].sort((a, b) => a - b);
+          radStarts = uniq.length > 0 ? uniq : [Math.min(Math.max(ideal, minStart), maxStart)];
+        }
+
         const backtrackSync = (idx: number, somaAtual: number, currentMeio: string[]) => {
           if (cancelRef.current) {
             return;
@@ -1079,14 +1097,9 @@ export default function GematriaCalculator() {
             combinacoesTestadas++;
 
             const meioJoin = currentMeio.join("");
-            let palavraCompleta = "";
-
-            if (isPal) {
-              const meioInvertido = meioJoin.split("").reverse().join("");
-              palavraCompleta = meioJoin + rad + meioInvertido;
-            } else {
-              palavraCompleta = pfx + rad + meioJoin + sfx;
-            }
+            // Palíndromo (legado): meio + radical + meio invertido.
+            const meioInvertido = meioJoin.split("").reverse().join("");
+            const palavraCompleta = meioJoin + rad + meioInvertido;
 
             if (palavraCompleta.length === totalLength && valorPalavraLatino(palavraCompleta) === targetValue) {
               if (regrasBasicasLatino(palavraCompleta) && regrasFoneticasLatino(palavraCompleta)) {
@@ -1110,13 +1123,7 @@ export default function GematriaCalculator() {
           // Poda fonética em tempo real no DFS
           if (idx > 0) {
             const partial: string[] = [];
-            if (!isPal) {
-              for (let k = 0; k < pfx.length; k++) partial.push(pfx[k]);
-              for (let k = 0; k < rad.length; k++) partial.push(rad[k]);
-              for (let k = 0; k < idx; k++) partial.push(currentMeio[k]);
-            } else {
-              for (let k = 0; k < idx; k++) partial.push(currentMeio[k]);
-            }
+            for (let k = 0; k < idx; k++) partial.push(currentMeio[k]);
 
             if (!canProceedLatinoInDFS(partial)) {
               return;
@@ -1131,28 +1138,133 @@ export default function GematriaCalculator() {
           }
         };
 
-        if (letrasLivres > 0) {
-          const currentMeio = Array(letrasLivres).fill("");
-          for (let i = 0; i < ALFABETO_LAT_ARR.length; i++) {
-            if (cancelRef.current) break;
+        // DFS sobre template com posições fixas (prefixo/radical/sufixo).
+        const backtrackTemplate = (idx: number, somaAtual: number, currentWord: string[], template: string[]) => {
+          if (cancelRef.current) {
+            return;
+          }
 
-            const letter = ALFABETO_LAT_ARR[i];
-            const weight = LAT_VALORES[letter];
-            currentMeio[0] = letter;
+          if (idx === totalLength) {
+            combinacoesTestadas++;
 
-            backtrackSync(1, weight, currentMeio);
+            const palavraCompleta = currentWord.join("");
+            if (palavraCompleta.length === totalLength && valorPalavraLatino(palavraCompleta) === targetValue) {
+              if (regrasBasicasLatino(palavraCompleta) && regrasFoneticasLatino(palavraCompleta)) {
+                if (applyEstilo(palavraCompleta) && applyFiltroAvancado(palavraCompleta)) {
+                  if (!foundSet.has(palavraCompleta)) {
+                    foundSet.add(palavraCompleta);
+                    itemsEncontrados.push(palavraCompleta);
+                  }
+                }
+              }
+            }
+            return;
+          }
 
-            const now = performance.now();
-            setStats({
-              tested: combinacoesTestadas,
-              found: itemsEncontrados.length,
-              timeMs: Math.max(1, Math.round(now - startTime))
-            });
-            setResults([...itemsEncontrados]);
-            await new Promise(resolve => setTimeout(resolve, 0));
+          // Poda matemática de peso (fixas futuras são A-Z, limites 1..26 valem).
+          const faltamT = totalLength - idx;
+          if (somaAtual + (faltamT * 1) > targetValue || somaAtual + (faltamT * 26) < targetValue) {
+            return;
+          }
+
+          // Poda fonética no prefixo preenchido (inclui prefixo fixo).
+          if (idx > 0) {
+            if (!canProceedLatinoInDFS(currentWord.slice(0, idx))) {
+              return;
+            }
+          }
+
+          if (template[idx] !== "") {
+            const letter = template[idx];
+            const weight = LAT_VALORES[letter] || 0;
+            currentWord[idx] = letter;
+            backtrackTemplate(idx + 1, somaAtual + weight, currentWord, template);
+          } else {
+            for (let i = 0; i < ALFABETO_LAT_ARR.length; i++) {
+              const letter = ALFABETO_LAT_ARR[i];
+              const weight = LAT_VALORES[letter];
+              currentWord[idx] = letter;
+              backtrackTemplate(idx + 1, somaAtual + weight, currentWord, template);
+            }
+            currentWord[idx] = "";
+          }
+        };
+
+        const evalFixedTemplate = (template: string[]) => {
+          combinacoesTestadas++;
+          const palavraCompleta = template.join("");
+          if (palavraCompleta.length === totalLength && valorPalavraLatino(palavraCompleta) === targetValue) {
+            if (regrasBasicasLatino(palavraCompleta) && regrasFoneticasLatino(palavraCompleta)) {
+              if (applyEstilo(palavraCompleta) && applyFiltroAvancado(palavraCompleta)) {
+                if (!foundSet.has(palavraCompleta)) {
+                  foundSet.add(palavraCompleta);
+                  itemsEncontrados.push(palavraCompleta);
+                }
+              }
+            }
+          }
+        };
+
+        if (isPal) {
+          if (letrasLivres > 0) {
+            const currentMeio = Array(letrasLivres).fill("");
+            for (let i = 0; i < ALFABETO_LAT_ARR.length; i++) {
+              if (cancelRef.current) break;
+
+              const letter = ALFABETO_LAT_ARR[i];
+              const weight = LAT_VALORES[letter];
+              currentMeio[0] = letter;
+
+              backtrackSync(1, weight, currentMeio);
+
+              const now = performance.now();
+              setStats({
+                tested: combinacoesTestadas,
+                found: itemsEncontrados.length,
+                timeMs: Math.max(1, Math.round(now - startTime))
+              });
+              setResults([...itemsEncontrados]);
+              await new Promise(resolve => setTimeout(resolve, 0));
+            }
+          } else {
+            backtrackSync(0, 0, []);
           }
         } else {
-          backtrackSync(0, 0, []);
+          for (const start of radStarts) {
+            if (cancelRef.current) break;
+
+            const template: string[] = Array(totalLength).fill("");
+            for (let k = 0; k < pfx.length; k++) template[k] = pfx[k];
+            for (let k = 0; k < rad.length; k++) template[start + k] = rad[k];
+            for (let k = 0; k < sfx.length; k++) template[totalLength - sfx.length + k] = sfx[k];
+
+            const firstFree = template.findIndex(t => t === "");
+            if (firstFree === -1) {
+              evalFixedTemplate(template);
+              continue;
+            }
+
+            const firstCandidates = template[0] !== "" ? [template[0]] : ALFABETO_LAT_ARR;
+            const currentWord: string[] = Array(totalLength).fill("");
+            for (let s = 0; s < firstCandidates.length; s++) {
+              if (cancelRef.current) break;
+
+              const letter = firstCandidates[s];
+              const weight = LAT_VALORES[letter] || 0;
+              currentWord[0] = letter;
+
+              backtrackTemplate(1, weight, currentWord, template);
+
+              const now = performance.now();
+              setStats({
+                tested: combinacoesTestadas,
+                found: itemsEncontrados.length,
+                timeMs: Math.max(1, Math.round(now - startTime))
+              });
+              setResults([...itemsEncontrados]);
+              await new Promise(resolve => setTimeout(resolve, 0));
+            }
+          }
         }
 
       } else {
@@ -1224,6 +1336,15 @@ export default function GematriaCalculator() {
           }
         });
 
+        // Letras obrigatórias em qualquer posição livre (ex.: "R" ou "R,T").
+        // Fixas já contam: só restam as que o template ainda não contém.
+        const requiredEff: string[] = [];
+        for (const c of requiredLettersInput.toUpperCase()) {
+          if (c >= "A" && c <= "Z" && !requiredEff.includes(c) && !palTemplate.includes(c)) {
+            requiredEff.push(c);
+          }
+        }
+
         const matchesWildcards = (word: string, specs: WildcardSpec[]): boolean => {
           if (specs.length === 0) return true;
           
@@ -1257,6 +1378,9 @@ export default function GematriaCalculator() {
             combinacoesTestadas++;
 
             const palavraCompleta = currentWord.join("");
+            if (requiredEff.length > 0 && !requiredEff.every(c => palavraCompleta.includes(c))) {
+              return;
+            }
             if (somaAtual === targetValue && regrasBasicasLatino(palavraCompleta)) {
               if (regrasFoneticasLatino(palavraCompleta)) {
                 if (applyEstilo(palavraCompleta) && applyFiltroAvancado(palavraCompleta)) {
@@ -1276,6 +1400,20 @@ export default function GematriaCalculator() {
           const letrasFaltantes = totalLength - idx;
           if (somaAtual + (letrasFaltantes * 1) > targetValue || somaAtual + (letrasFaltantes * 26) < targetValue) {
             return;
+          }
+
+          // Poda por letras obrigatórias: as que faltam têm que caber nas livres à frente.
+          if (requiredEff.length > 0) {
+            let missing = 0;
+            for (const c of requiredEff) {
+              if (currentWord.slice(0, idx).includes(c)) continue;
+              if (palTemplate.slice(idx).includes(c)) continue;
+              missing++;
+            }
+            const freeRemaining = palTemplate.slice(idx).filter(t => t === "").length;
+            if (missing > freeRemaining) {
+              return;
+            }
           }
 
           // Poda fonética customizada em tempo real
@@ -1868,19 +2006,35 @@ export default function GematriaCalculator() {
               </div>
             ) : (
               /* Option 1B: Personalizada parameters */
-              <div className="space-y-2">
-                <span className="text-[10px] text-neutral-400 uppercase block font-mono">Fixar Posições (Ex: 1A,3M)</span>
-                <input
-                  id="input-fixed-letters"
-                  type="text"
-                  placeholder="Ex: 1M,3T"
-                  value={fixedLettersInput}
-                  onChange={(e) => setFixedLettersInput(e.target.value)}
-                  className="w-full bg-neutral-950 text-xs text-white border border-neutral-800 rounded-lg p-2 uppercase outline-none focus:border-amber-500/40"
-                />
-                <p className="text-[10px] text-neutral-400 leading-normal">
-                  Informa posições que devem ter letras específicas. Posições são indexadas a partir de 1.
-                </p>
+              <div className="space-y-3">
+                <div className="space-y-2">
+                  <span className="text-[10px] text-neutral-400 uppercase block font-mono">Fixar Posições (Ex: 1A,3M)</span>
+                  <input
+                    id="input-fixed-letters"
+                    type="text"
+                    placeholder="Ex: 1M,3T"
+                    value={fixedLettersInput}
+                    onChange={(e) => setFixedLettersInput(e.target.value)}
+                    className="w-full bg-neutral-950 text-xs text-white border border-neutral-800 rounded-lg p-2 uppercase outline-none focus:border-amber-500/40"
+                  />
+                  <p className="text-[10px] text-neutral-400 leading-normal">
+                    Informa posições que devem ter letras específicas. Posições são indexadas a partir de 1.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <span className="text-[10px] text-neutral-400 uppercase block font-mono">Obrigatórias em qualquer posição (Ex: R,T)</span>
+                  <input
+                    id="input-required-letters"
+                    type="text"
+                    placeholder="Ex: R,T"
+                    value={requiredLettersInput}
+                    onChange={(e) => setRequiredLettersInput(e.target.value)}
+                    className="w-full bg-neutral-950 text-xs text-white border border-neutral-800 rounded-lg p-2 uppercase outline-none focus:border-amber-500/40"
+                  />
+                  <p className="text-[10px] text-neutral-400 leading-normal">
+                    Letras que devem aparecer na palavra em qualquer posição livre, respeitando as fixas acima.
+                  </p>
+                </div>
               </div>
             )}
 

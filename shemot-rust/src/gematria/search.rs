@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
@@ -155,6 +155,267 @@ fn matches_wildcards(
     false
 }
 
+/// Shared template-driven DFS for Latino searches.
+///
+/// `pal_template`: fixed letter per position (`'\0'` = free slot).
+/// `fixas`: fixed positions map (used for wildcard range checks).
+/// `required`: letters that must appear at least once (any position).
+/// Used by the custom/fixed mode and by each radical placement of the
+/// etimologico mode (prefix at start, suffix at end, radical centered).
+fn dfs_latino_template(
+    idx: usize,
+    soma_atual: u32,
+    current_word: &mut [char],
+    total_length: usize,
+    target_value: u32,
+    pal_template: &[char],
+    fixas: &HashMap<usize, char>,
+    wildcards: &[WildcardSpec],
+    required: &[char],
+    use_estilo: bool,
+    estilo: &LatinoEstilo,
+    use_avancado: bool,
+    avancado: &LatinoAvancado,
+    alfabeto: &[char],
+    cancel_flag: &AtomicBool,
+    tested_count: &mut u64,
+    found_set: &mut HashSet<String>,
+    results: &mut Vec<String>,
+    on_iteration: &mut dyn FnMut(u64, usize),
+) {
+    if cancel_flag.load(Ordering::Relaxed) {
+        return;
+    }
+
+    if idx == total_length {
+        *tested_count += 1;
+
+        // Required-letters-anywhere check.
+        if !required.is_empty() {
+            let mut ok = true;
+            for &c in required {
+                if !current_word.contains(&c) {
+                    ok = false;
+                    break;
+                }
+            }
+            if !ok {
+                if *tested_count % 50000 == 0 {
+                    on_iteration(*tested_count, results.len());
+                }
+                return;
+            }
+        }
+
+        let palavra_completa: String = current_word.iter().collect();
+        if soma_atual == target_value && regras_basicas_latino(&palavra_completa) {
+            if regras_foneticas_latino(&palavra_completa) {
+                if apply_estilo(&palavra_completa, use_estilo, estilo)
+                    && apply_filtro_avancado(&palavra_completa, use_avancado, avancado)
+                {
+                    if matches_wildcards(current_word, wildcards, fixas, 0, -1) {
+                        if !found_set.contains(&palavra_completa) {
+                            found_set.insert(palavra_completa.clone());
+                            results.push(palavra_completa);
+                        }
+                    }
+                }
+            }
+        }
+
+        if *tested_count % 50000 == 0 {
+            on_iteration(*tested_count, results.len());
+        }
+        return;
+    }
+
+    // Gematria weight pruning (fixed future letters are A-Z, so 1..26 bounds hold).
+    let letras_faltantes = (total_length - idx) as u32;
+    if soma_atual + (letras_faltantes * 1) > target_value
+        || soma_atual + (letras_faltantes * 26) < target_value
+    {
+        return;
+    }
+
+    // Required-letters pruning: missing letters must fit in the free slots ahead.
+    if !required.is_empty() {
+        let mut missing = 0;
+        for &c in required {
+            if current_word[..idx].contains(&c) {
+                continue;
+            }
+            if pal_template[idx..].contains(&c) {
+                continue;
+            }
+            missing += 1;
+        }
+        let free_remaining = pal_template[idx..].iter().filter(|&&t| t == '\0').count();
+        if missing > free_remaining {
+            return;
+        }
+    }
+
+    // Live phonetic pruning on the filled prefix (includes fixed prefix chars).
+    if idx > 0 {
+        let partial = &current_word[..idx];
+        if !can_proceed_latino_in_dfs(partial, use_estilo, estilo, use_avancado, avancado) {
+            return;
+        }
+    }
+
+    let locked_char = pal_template[idx];
+    if locked_char != '\0' {
+        let weight = (locked_char as u32 - 'A' as u32) + 1;
+        current_word[idx] = locked_char;
+        dfs_latino_template(
+            idx + 1,
+            soma_atual + weight,
+            current_word,
+            total_length,
+            target_value,
+            pal_template,
+            fixas,
+            wildcards,
+            required,
+            use_estilo,
+            estilo,
+            use_avancado,
+            avancado,
+            alfabeto,
+            cancel_flag,
+            tested_count,
+            found_set,
+            results,
+            on_iteration,
+        );
+    } else {
+        for &letter in alfabeto {
+            let weight = (letter as u32 - 'A' as u32) + 1;
+            current_word[idx] = letter;
+            dfs_latino_template(
+                idx + 1,
+                soma_atual + weight,
+                current_word,
+                total_length,
+                target_value,
+                pal_template,
+                fixas,
+                wildcards,
+                required,
+                use_estilo,
+                estilo,
+                use_avancado,
+                avancado,
+                alfabeto,
+                cancel_flag,
+                tested_count,
+                found_set,
+                results,
+                on_iteration,
+            );
+        }
+        current_word[idx] = ' ';
+    }
+}
+
+/// Outer driver for the template DFS: iterates the first free position for
+/// smooth progress callbacks, then delegates the rest to `dfs_latino_template`.
+#[allow(clippy::too_many_arguments)]
+fn run_latino_template(
+    target_value: u32,
+    total_length: usize,
+    pal_template: &[char],
+    fixas: &HashMap<usize, char>,
+    wildcards: &[WildcardSpec],
+    required: &[char],
+    use_estilo: bool,
+    estilo: &LatinoEstilo,
+    use_avancado: bool,
+    avancado: &LatinoAvancado,
+    alfabeto: &[char],
+    cancel_flag: &AtomicBool,
+    tested_count: &mut u64,
+    found_set: &mut HashSet<String>,
+    results: &mut Vec<String>,
+    on_iteration: &mut dyn FnMut(u64, usize),
+) {
+    if total_length == 0 {
+        return;
+    }
+    let mut current_word = vec![' '; total_length];
+
+    // Fully fixed template: single evaluation.
+    if !pal_template.contains(&'\0') {
+        let mut soma = 0u32;
+        for (i, &t) in pal_template.iter().enumerate() {
+            current_word[i] = t;
+            soma += (t as u32 - 'A' as u32) + 1;
+        }
+        dfs_latino_template(
+            total_length,
+            soma,
+            &mut current_word,
+            total_length,
+            target_value,
+            pal_template,
+            fixas,
+            wildcards,
+            required,
+            use_estilo,
+            estilo,
+            use_avancado,
+            avancado,
+            alfabeto,
+            cancel_flag,
+            tested_count,
+            found_set,
+            results,
+            on_iteration,
+        );
+        on_iteration(*tested_count, results.len());
+        return;
+    }
+
+    // Otherwise iterate position 0 (fixed char or whole alphabet) for
+    // smooth progress callbacks; the DFS fills the rest.
+    let first_candidates: Vec<char> = if pal_template[0] != '\0' {
+        vec![pal_template[0]]
+    } else {
+        alfabeto.to_vec()
+    };
+
+    for &letter in &first_candidates {
+        if cancel_flag.load(Ordering::Relaxed) {
+            break;
+        }
+        let weight = (letter as u32 - 'A' as u32) + 1;
+        current_word[0] = letter;
+
+        dfs_latino_template(
+            1,
+            weight,
+            &mut current_word,
+            total_length,
+            target_value,
+            pal_template,
+            fixas,
+            wildcards,
+            required,
+            use_estilo,
+            estilo,
+            use_avancado,
+            avancado,
+            alfabeto,
+            cancel_flag,
+            tested_count,
+            found_set,
+            results,
+            on_iteration,
+        );
+        on_iteration(*tested_count, results.len());
+    }
+}
+
 /// Backtracking search engine for Latino Alphabet under Etimologico mode.
 pub fn backtrack_latino_etimologico(
     target_value: u32,
@@ -204,6 +465,70 @@ pub fn backtrack_latino_etimologico(
             return results;
         }
         target_meio_val = target_value - fixo_val;
+    }
+
+    // Non-palindrome: prefix at start, suffix at end, radical centered
+    // (ideal center ±1 position; a long suffix pushes it left, a long
+    // prefix pushes it right). Each placement runs the shared template DFS.
+    if !is_pal {
+        let p_len = pfx.chars().count();
+        let s_len = sfx.chars().count();
+        let r_len = rad.chars().count();
+        let min_start = p_len;
+        let max_start = total_length - s_len - r_len;
+        let starts: Vec<usize> = if r_len == 0 {
+            vec![min_start]
+        } else {
+            let ideal = (total_length - r_len) / 2;
+            let mut cand: Vec<usize> = [ideal.saturating_sub(1), ideal, ideal + 1]
+                .into_iter()
+                .filter(|&s| s >= min_start && s <= max_start)
+                .collect();
+            cand.sort_unstable();
+            cand.dedup();
+            if cand.is_empty() {
+                cand.push(ideal.clamp(min_start, max_start));
+            }
+            cand
+        };
+
+        let alfabeto: Vec<char> = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".chars().collect();
+        let empty_fixas: HashMap<usize, char> = HashMap::new();
+        let empty_wildcards: Vec<WildcardSpec> = Vec::new();
+        let empty_required: Vec<char> = Vec::new();
+
+        for start in starts {
+            let mut pal_template = vec!['\0'; total_length];
+            for (i, c) in pfx.chars().enumerate() {
+                pal_template[i] = c;
+            }
+            for (i, c) in rad.chars().enumerate() {
+                pal_template[start + i] = c;
+            }
+            for (i, c) in sfx.chars().enumerate() {
+                pal_template[total_length - s_len + i] = c;
+            }
+            run_latino_template(
+                target_value,
+                total_length,
+                &pal_template,
+                &empty_fixas,
+                &empty_wildcards,
+                &empty_required,
+                use_estilo,
+                estilo,
+                use_avancado,
+                avancado,
+                &alfabeto,
+                &cancel_flag,
+                &mut tested_count,
+                &mut found_set,
+                &mut results,
+                on_iteration,
+            );
+        }
+        on_iteration(tested_count, results.len());
+        return results;
     }
 
     let letras_livres = letras_livres as usize;
@@ -384,11 +709,15 @@ pub fn backtrack_latino_etimologico(
 }
 
 /// Backtracking search engine for Latino Alphabet under Customizable structure.
+///
+/// `required_letters`: letters that must appear at least once in a free
+/// position (fixed positions already count). Ex.: "R" or "R,T".
 pub fn backtrack_latino_custom(
     target_value: u32,
     total_length: usize,
     fixas: &std::collections::HashMap<usize, char>,
     wildcards: &[WildcardSpec],
+    required_letters: &str,
     use_estilo: bool,
     estilo: &LatinoEstilo,
     use_avancado: bool,
@@ -401,7 +730,6 @@ pub fn backtrack_latino_custom(
     let mut tested_count: u64 = 0;
 
     let alfabeto: Vec<char> = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".chars().collect();
-    let mut current_word = vec![' '; total_length];
 
     // Helper template for fast lookups
     let mut pal_template = vec!['\0'; total_length];
@@ -411,160 +739,32 @@ pub fn backtrack_latino_custom(
         }
     }
 
-    fn dfs_custom(
-        idx: usize,
-        soma_atual: u32,
-        current_word: &mut [char],
-        total_length: usize,
-        target_value: u32,
-        pal_template: &[char],
-        fixas: &std::collections::HashMap<usize, char>,
-        wildcards: &[WildcardSpec],
-        use_estilo: bool,
-        estilo: &LatinoEstilo,
-        use_avancado: bool,
-        avancado: &LatinoAvancado,
-        alfabeto: &[char],
-        cancel_flag: &AtomicBool,
-        tested_count: &mut u64,
-        found_set: &mut HashSet<String>,
-        results: &mut Vec<String>,
-        on_iteration: &mut dyn FnMut(u64, usize),
-    ) {
-        if cancel_flag.load(Ordering::Relaxed) {
-            return;
-        }
-
-        if idx == total_length {
-            *tested_count += 1;
-
-            let palavra_completa: String = current_word.iter().collect();
-            if soma_atual == target_value && regras_basicas_latino(&palavra_completa) {
-                if regras_foneticas_latino(&palavra_completa) {
-                    if apply_estilo(&palavra_completa, use_estilo, estilo)
-                        && apply_filtro_avancado(&palavra_completa, use_avancado, avancado)
-                    {
-                        if matches_wildcards(current_word, wildcards, fixas, 0, -1) {
-                            if !found_set.contains(&palavra_completa) {
-                                found_set.insert(palavra_completa.clone());
-                                results.push(palavra_completa);
-                            }
-                        }
-                    }
-                }
-            }
-
-            if *tested_count % 50000 == 0 {
-                on_iteration(*tested_count, results.len());
-            }
-            return;
-        }
-
-        // Pruning weights
-        let letras_faltantes = (total_length - idx) as u32;
-        if soma_atual + (letras_faltantes * 1) > target_value || soma_atual + (letras_faltantes * 26) < target_value {
-            return;
-        }
-
-        // Live phonetic pruning
-        if idx > 0 {
-            let partial = &current_word[..idx];
-            if !can_proceed_latino_in_dfs(partial, use_estilo, estilo, use_avancado, avancado) {
-                return;
-            }
-        }
-
-        let locked_char = pal_template[idx];
-        if locked_char != '\0' {
-            let weight = (locked_char as u32 - 'A' as u32) + 1;
-            current_word[idx] = locked_char;
-            dfs_custom(
-                idx + 1,
-                soma_atual + weight,
-                current_word,
-                total_length,
-                target_value,
-                pal_template,
-                fixas,
-                wildcards,
-                use_estilo,
-                estilo,
-                use_avancado,
-                avancado,
-                alfabeto,
-                cancel_flag,
-                tested_count,
-                found_set,
-                results,
-                on_iteration,
-            );
-        } else {
-            for &letter in alfabeto {
-                let weight = (letter as u32 - 'A' as u32) + 1;
-                current_word[idx] = letter;
-                dfs_custom(
-                    idx + 1,
-                    soma_atual + weight,
-                    current_word,
-                    total_length,
-                    target_value,
-                    pal_template,
-                    fixas,
-                    wildcards,
-                    use_estilo,
-                    estilo,
-                    use_avancado,
-                    avancado,
-                    alfabeto,
-                    cancel_flag,
-                    tested_count,
-                    found_set,
-                    results,
-                    on_iteration,
-                );
-            }
-            current_word[idx] = ' ';
+    // Parse required letters (uppercase A-Z, deduped).
+    let mut required: Vec<char> = Vec::new();
+    for c in required_letters.to_uppercase().chars() {
+        if c.is_ascii_alphabetic() && !required.contains(&c) {
+            required.push(c);
         }
     }
 
-    if total_length > 0 {
-        let first_letter_template = pal_template[0];
-        let candidates = if first_letter_template != '\0' {
-            vec![first_letter_template]
-        } else {
-            alfabeto.clone()
-        };
-
-        for &letter in &candidates {
-            if cancel_flag.load(Ordering::Relaxed) {
-                break;
-            }
-            let weight = (letter as u32 - 'A' as u32) + 1;
-            current_word[0] = letter;
-
-            dfs_custom(
-                1,
-                weight,
-                &mut current_word,
-                total_length,
-                target_value,
-                &pal_template,
-                fixas,
-                wildcards,
-                use_estilo,
-                estilo,
-                use_avancado,
-                avancado,
-                &alfabeto,
-                &cancel_flag,
-                &mut tested_count,
-                &mut found_set,
-                &mut results,
-                on_iteration,
-            );
-            on_iteration(tested_count, results.len());
-        }
-    }
+    run_latino_template(
+        target_value,
+        total_length,
+        &pal_template,
+        fixas,
+        wildcards,
+        &required,
+        use_estilo,
+        estilo,
+        use_avancado,
+        avancado,
+        &alfabeto,
+        &cancel_flag,
+        &mut tested_count,
+        &mut found_set,
+        &mut results,
+        on_iteration,
+    );
 
     on_iteration(tested_count, results.len());
     results
@@ -909,4 +1109,110 @@ pub fn backtrack_grego(
 
     on_iteration(tested_count, results.len());
     results
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::collections::HashMap;
+
+    fn estilo_off() -> LatinoEstilo {
+        LatinoEstilo { min_v: 0, max_v: 99, min_c: 0, max_c: 99, max_v_seq: 99 }
+    }
+
+    fn avancado_off() -> LatinoAvancado {
+        LatinoAvancado {
+            iniciar_com_consoante: false,
+            terminar_com_vogal: false,
+            permitir_k: true,
+            permitir_w: true,
+            permitir_y: true,
+            restringir_finais: false,
+            permitir_finais_estrangeiros: true,
+            restringir_inicio_consonantal: false,
+        }
+    }
+
+    fn no_cancel() -> Arc<AtomicBool> {
+        Arc::new(AtomicBool::new(false))
+    }
+
+    #[test]
+    fn etimologico_radical_centered() {
+        // MA + T + OS, L=5, alvo=68 -> só "MATOS" (sem letras livres).
+        let cancel = no_cancel();
+        let estilo = estilo_off();
+        let avancado = avancado_off();
+        let mut noop = |_: u64, _: usize| {};
+        let res = backtrack_latino_etimologico(
+            68, 5, "MA", "OS", "T", "none",
+            false, &estilo, false, &avancado,
+            cancel, &mut noop,
+        );
+        assert_eq!(res, vec!["MATOS".to_string()]);
+    }
+
+    #[test]
+    fn etimologico_radical_middle_with_free_both_sides() {
+        // L=6, prefixo M, sufixo S, radical T, alvo=77 ("MOTAIS").
+        // Radical deve ficar nas posições 1..=3, nunca grudado no prefixo.
+        let cancel = no_cancel();
+        let estilo = estilo_off();
+        let avancado = avancado_off();
+        let mut noop = |_: u64, _: usize| {};
+        let res = backtrack_latino_etimologico(
+            77, 6, "M", "S", "T", "none",
+            false, &estilo, false, &avancado,
+            cancel, &mut noop,
+        );
+        assert!(res.contains(&"MOTAIS".to_string()), "got {:?}", &res[..res.len().min(5)]);
+        for w in &res {
+            let ch: Vec<char> = w.chars().collect();
+            assert_eq!(ch.len(), 6);
+            assert_eq!(ch[0], 'M');
+            assert_eq!(ch[5], 'S');
+            let tpos = ch.iter().position(|&c| c == 'T').unwrap();
+            assert!((1..=3).contains(&tpos), "{w}: T fora do meio");
+            assert_eq!(valor_palavra_latino(w), 77);
+        }
+    }
+
+    #[test]
+    fn etimologico_long_suffix_pushes_radical_left() {
+        // L=5, sufixo longo "TROS" (4) + radical "A": só cabe em 0.
+        // A=1,T=20,R=18,O=15,S=19 -> "ATROS" = 73.
+        let cancel = no_cancel();
+        let estilo = estilo_off();
+        let avancado = avancado_off();
+        let mut noop = |_: u64, _: usize| {};
+        let res = backtrack_latino_etimologico(
+            73, 5, "", "TROS", "A", "none",
+            false, &estilo, false, &avancado,
+            cancel, &mut noop,
+        );
+        assert_eq!(res, vec!["ATROS".to_string()]);
+    }
+
+    #[test]
+    fn custom_required_letters_anywhere() {
+        // L=5, 4O+5S fixos, R obrigatório: "BRAOS" = 2+18+1+15+19 = 55.
+        let cancel = no_cancel();
+        let estilo = estilo_off();
+        let avancado = avancado_off();
+        let mut noop = |_: u64, _: usize| {};
+        let mut fixas = HashMap::new();
+        fixas.insert(3, 'O');
+        fixas.insert(4, 'S');
+        let wildcards = Vec::new();
+        let res = backtrack_latino_custom(
+            55, 5, &fixas, &wildcards, "R",
+            false, &estilo, false, &avancado,
+            cancel, &mut noop,
+        );
+        assert!(res.contains(&"BRAOS".to_string()), "got {:?}", &res[..res.len().min(5)]);
+        for w in &res {
+            assert!(w.contains('R'), "{w} sem R obrigatório");
+            assert!(w.ends_with("OS"));
+        }
+    }
 }

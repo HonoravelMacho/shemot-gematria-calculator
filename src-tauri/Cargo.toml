@@ -1,6 +1,6 @@
 [package]
 name = "shemot-app"
-version = "1.0.11"
+version = "1.0.12"
 description = "Shemot Gematria Search Engine"
 authors = ["Shemot Team"]
 edition = "2021"

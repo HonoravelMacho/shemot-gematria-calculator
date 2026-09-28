@@ -57,6 +57,7 @@ fn run_gematria_search(
     radical: String,
     modo_radical: String,
     fixed_letters_input: String,
+    required_letters_input: String,
     use_estilo: bool,
     min_v: u32,
     max_v: u32,
@@ -215,11 +216,20 @@ fn run_gematria_search(
                 }
             }
 
+            // Letras obrigatórias em qualquer posição (ex.: "R" ou "R,T").
+            let mut required_dedup = String::new();
+            for c in required_letters_input.to_uppercase().chars() {
+                if c.is_ascii_alphabetic() && !required_dedup.contains(c) {
+                    required_dedup.push(c);
+                }
+            }
+
             raw_results = backtrack_latino_custom(
                 target_value,
                 total_length,
                 &fixas,
                 &wildcards,
+                &required_dedup,
                 use_estilo,
                 &estilo,
                 use_avancado,
