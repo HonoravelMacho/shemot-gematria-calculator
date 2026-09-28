@@ -1,9 +1,13 @@
 [package]
 name = "shemot-app"
-version = "1.0.5"
+version = "1.0.7"
 description = "Shemot Gematria Search Engine"
 authors = ["Shemot Team"]
 edition = "2021"
+
+[lib]
+name = "shemot_app_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
 tauri-build = { version = "2" }

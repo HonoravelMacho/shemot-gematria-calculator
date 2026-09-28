@@ -2876,7 +2876,7 @@ dependencies = [
 
 [[package]]
 name = "shemot"
-version = "1.0.0"
+version = "1.0.5"
 dependencies = [
  "colored",
  "serde",
@@ -2885,7 +2885,7 @@ dependencies = [
 
 [[package]]
 name = "shemot-app"
-version = "1.0.0"
+version = "1.0.5"
 dependencies = [
  "serde",
  "serde_json",
