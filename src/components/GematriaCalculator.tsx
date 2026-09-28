@@ -10,6 +10,7 @@ import {
   Book, Search, Copy, Check, Info, Square
 } from "lucide-react";
 import { AlphabetType, LatinoEstilo, LatinoAvancado, SearchStats } from "../types";
+import { invokeSearch, invokeCancel, listenProgress, isTauriRuntime } from "../lib/tauri";
 import { 
   GREEK_DICTIONARY, 
   HEBREW_DICTIONARY, 
@@ -263,12 +264,8 @@ export default function GematriaCalculator() {
   const cancelRef = useRef<boolean>(false);
   const cancelSearch = () => {
     cancelRef.current = true;
-    const isTauri = typeof window !== "undefined" && (
-      (window as any).__TAURI__ !== undefined || 
-      (window as any).__TAURI_INTERNALS__ !== undefined
-    );
-    if (isTauri) {
-      (window as any).__TAURI__.invoke("cancel_search").catch(console.error);
+    if (isTauriRuntime()) {
+      invokeCancel();
     }
   };
   const [stats, setStats] = useState<SearchStats>({ tested: 0, found: 0, timeMs: 0 });
@@ -859,23 +856,16 @@ export default function GematriaCalculator() {
       timeMs: 1
     });
 
-    const isTauri = typeof window !== "undefined" && (
-      (window as any).__TAURI__ !== undefined || 
-      (window as any).__TAURI_INTERNALS__ !== undefined
-    );
+    const isTauri = isTauriRuntime();
 
     if (isTauri) {
       try {
-        const tauriInvoke = (window as any).__TAURI__.invoke;
-        const tauriEvent = (window as any).__TAURI__.event;
-        
         let unlistenProgress: (() => void) | undefined;
         let lastTested = 0;
         let lastFound = itemsEncontrados.length;
 
-        if (tauriEvent && tauriEvent.listen) {
-          unlistenProgress = await tauriEvent.listen("search_progress", (event: any) => {
-            const payload = event.payload;
+        try {
+          unlistenProgress = await listenProgress((payload) => {
             lastTested = payload.tested;
             lastFound = payload.found;
             setStats({
@@ -884,9 +874,11 @@ export default function GematriaCalculator() {
               timeMs: Math.max(1, Math.round(performance.now() - startTime))
             });
           });
+        } catch (e) {
+          console.warn("listenProgress indisponível:", e);
         }
 
-        const tauriResults: any[] = await tauriInvoke("run_gematria_search", {
+        const tauriResults = await invokeSearch("run_gematria_search", {
           targetValue,
           totalLength,
           alphabet: alphabet.toLowerCase(),
@@ -1549,10 +1541,10 @@ export default function GematriaCalculator() {
   };
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+    <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 md:gap-8 items-start">
       
       {/* Control Panel Col */}
-      <div className="xl:col-span-5 space-y-6 bg-neutral-900/60 p-5 md:p-6 rounded-2xl border border-neutral-800">
+      <div className="xl:col-span-5 space-y-5 md:space-y-6 bg-neutral-900/60 p-4 sm:p-5 md:p-6 rounded-2xl border border-neutral-800 min-w-0">
         
         <div className="flex items-center gap-2 pb-4 border-b border-neutral-800">
           <Settings className="text-amber-500 h-5 w-5" />
@@ -2029,7 +2021,7 @@ export default function GematriaCalculator() {
         {isSearching ? (
           <button
             onClick={cancelSearch}
-            className="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3 px-4 rounded-xl transition duration-150 flex items-center justify-center gap-2 shadow-md cursor-pointer text-sm animate-pulse"
+            className="w-full min-h-[48px] bg-red-600 hover:bg-red-500 text-white font-bold py-3 px-4 rounded-xl transition duration-150 flex items-center justify-center gap-2 shadow-md cursor-pointer text-sm animate-pulse"
           >
             <Square className="h-4 w-4 fill-current text-white" />
             Parar Busca (Cancelar)
@@ -2037,7 +2029,7 @@ export default function GematriaCalculator() {
         ) : (
           <button
             onClick={runSearch}
-            className="w-full bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold py-3 px-4 rounded-xl transition duration-150 flex items-center justify-center gap-2 shadow-md cursor-pointer text-sm"
+            className="w-full min-h-[48px] bg-amber-500 hover:bg-amber-400 active:bg-amber-300 text-neutral-950 font-bold py-3 px-4 rounded-xl transition duration-150 flex items-center justify-center gap-2 shadow-md cursor-pointer text-sm"
           >
             <Play className="h-4 w-4 fill-current" />
             Iniciar Motor de Busca
@@ -2331,10 +2323,10 @@ export default function GematriaCalculator() {
       </div>
 
       {/* Terminal View Col */}
-      <div className="xl:col-span-7 space-y-6">
+      <div className="xl:col-span-7 space-y-5 md:space-y-6 min-w-0">
         
         {/* Statistics Board */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
           
           <div className="bg-neutral-900/40 border border-neutral-800 p-4 rounded-2xl">
             <span className="text-[10px] text-neutral-400 uppercase tracking-wider block font-mono">Testadas</span>
@@ -2368,7 +2360,7 @@ export default function GematriaCalculator() {
         </div>
 
         {/* Real Console Terminal Box */}
-        <div className="bg-neutral-950 rounded-2xl border border-neutral-800 overflow-hidden flex flex-col h-[480px]">
+        <div className="bg-neutral-950 rounded-2xl border border-neutral-800 overflow-hidden flex flex-col h-[62vh] min-h-[380px] max-h-[640px] md:h-[480px] md:max-h-none">
           
           {/* Header of Console */}
           <div className="bg-neutral-900 px-4 py-3 border-b border-neutral-800 flex items-center justify-between">
@@ -2439,7 +2431,7 @@ export default function GematriaCalculator() {
           )}
 
           {/* Console Content screen */}
-          <div translate="no" className="flex-1 p-5 font-mono text-xs overflow-y-auto space-y-2 text-left bg-neutral-950 notranslate">
+          <div translate="no" className="flex-1 p-3 sm:p-5 font-mono text-xs overflow-y-auto space-y-2 text-left bg-neutral-950 notranslate overscroll-contain">
             <div className="text-neutral-500">
               # Terminal inicializado. Pronto para buscas combinatórias em {alphabet.toUpperCase()}.
               {dictionaryFilterMode !== "all" && ` (Filtrado: apenas termos do dicionário offline)`}

@@ -1,50 +1,15 @@
 {
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Shemot Gematria",
+  "version": "1.0.0",
+  "identifier": "com.shemot.gematria",
   "build": {
     "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:3000",
     "beforeBuildCommand": "npm run build",
-    "devPath": "http://localhost:3000",
-    "distDir": "../dist"
+    "frontendDist": "../dist"
   },
-  "package": {
-    "productName": "Shemot Gematria",
-    "version": "1.0.0"
-  },
-  "tauri": {
-    "allowlist": {
-      "all": true
-    },
-    "bundle": {
-      "active": true,
-      "category": "DeveloperTool",
-      "copyright": "",
-      "deb": {
-        "depends": []
-      },
-      "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
-      ],
-      "identifier": "com.shemot.gematria",
-      "longDescription": "",
-      "macOS": {
-        "frameworks": [],
-        "minimumSystemVersion": ""
-      },
-      "resources": [],
-      "shortDescription": "",
-      "targets": "all",
-      "windows": {
-        "certificateThumbprint": null,
-        "digestAlgorithm": "sha256",
-        "timestampUrl": ""
-      }
-    },
-    "security": {
-      "csp": null
-    },
+  "app": {
     "windows": [
       {
         "fullscreen": false,
@@ -53,6 +18,36 @@
         "title": "Shemot Gematria",
         "width": 1200
       }
-    ]
+    ],
+    "security": {
+      "csp": null
+    },
+    "withGlobalTauri": true
+  },
+  "bundle": {
+    "active": true,
+    "category": "DeveloperTool",
+    "copyright": "",
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "longDescription": "Calculadora e motor de busca de Gematria (Hebreu, Grego e Latino) com dicionário offline e engine combinatória em Rust.",
+    "shortDescription": "Motor de busca de Gematria multilingue",
+    "linux": {
+      "deb": {
+        "depends": []
+      }
+    },
+    "windows": {
+      "digestAlgorithm": "sha256"
+    },
+    "android": {
+      "minSdkVersion": 24
+    }
   }
 }

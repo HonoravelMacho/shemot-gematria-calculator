@@ -1,0 +1,15 @@
+/home/tiagorabelo/shemot-gematria-calculator/src-tauri/target/debug/deps/shemot-15c61d45ceb292bf.d: /home/tiagorabelo/shemot-gematria-calculator/shemot-rust/src/lib.rs /home/tiagorabelo/shemot-gematria-calculator/shemot-rust/src/gematria/mod.rs /home/tiagorabelo/shemot-gematria-calculator/shemot-rust/src/gematria/alphabets.rs /home/tiagorabelo/shemot-gematria-calculator/shemot-rust/src/gematria/rules_latin.rs /home/tiagorabelo/shemot-gematria-calculator/shemot-rust/src/gematria/rules_greek.rs /home/tiagorabelo/shemot-gematria-calculator/shemot-rust/src/gematria/rules_hebrew.rs /home/tiagorabelo/shemot-gematria-calculator/shemot-rust/src/gematria/search.rs /home/tiagorabelo/shemot-gematria-calculator/shemot-rust/src/gematria/dictionaries.rs /home/tiagorabelo/shemot-gematria-calculator/shemot-rust/src/gematria/../../dictionaries/portuguese.json /home/tiagorabelo/shemot-gematria-calculator/shemot-rust/src/gematria/../../dictionaries/greek.json /home/tiagorabelo/shemot-gematria-calculator/shemot-rust/src/gematria/../../dictionaries/hebrew.json
+
+/home/tiagorabelo/shemot-gematria-calculator/src-tauri/target/debug/deps/libshemot-15c61d45ceb292bf.rmeta: /home/tiagorabelo/shemot-gematria-calculator/shemot-rust/src/lib.rs /home/tiagorabelo/shemot-gematria-calculator/shemot-rust/src/gematria/mod.rs /home/tiagorabelo/shemot-gematria-calculator/shemot-rust/src/gematria/alphabets.rs /home/tiagorabelo/shemot-gematria-calculator/shemot-rust/src/gematria/rules_latin.rs /home/tiagorabelo/shemot-gematria-calculator/shemot-rust/src/gematria/rules_greek.rs /home/tiagorabelo/shemot-gematria-calculator/shemot-rust/src/gematria/rules_hebrew.rs /home/tiagorabelo/shemot-gematria-calculator/shemot-rust/src/gematria/search.rs /home/tiagorabelo/shemot-gematria-calculator/shemot-rust/src/gematria/dictionaries.rs /home/tiagorabelo/shemot-gematria-calculator/shemot-rust/src/gematria/../../dictionaries/portuguese.json /home/tiagorabelo/shemot-gematria-calculator/shemot-rust/src/gematria/../../dictionaries/greek.json /home/tiagorabelo/shemot-gematria-calculator/shemot-rust/src/gematria/../../dictionaries/hebrew.json
+
+/home/tiagorabelo/shemot-gematria-calculator/shemot-rust/src/lib.rs:
+/home/tiagorabelo/shemot-gematria-calculator/shemot-rust/src/gematria/mod.rs:
+/home/tiagorabelo/shemot-gematria-calculator/shemot-rust/src/gematria/alphabets.rs:
+/home/tiagorabelo/shemot-gematria-calculator/shemot-rust/src/gematria/rules_latin.rs:
+/home/tiagorabelo/shemot-gematria-calculator/shemot-rust/src/gematria/rules_greek.rs:
+/home/tiagorabelo/shemot-gematria-calculator/shemot-rust/src/gematria/rules_hebrew.rs:
+/home/tiagorabelo/shemot-gematria-calculator/shemot-rust/src/gematria/search.rs:
+/home/tiagorabelo/shemot-gematria-calculator/shemot-rust/src/gematria/dictionaries.rs:
+/home/tiagorabelo/shemot-gematria-calculator/shemot-rust/src/gematria/../../dictionaries/portuguese.json:
+/home/tiagorabelo/shemot-gematria-calculator/shemot-rust/src/gematria/../../dictionaries/greek.json:
+/home/tiagorabelo/shemot-gematria-calculator/shemot-rust/src/gematria/../../dictionaries/hebrew.json:

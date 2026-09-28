@@ -6,3 +6,5 @@ coverage/
 *.log
 .env*
 !.env.example
+# Tauri v2 mobile (gerado via `tauri android|ios init`, não versionar)
+src-tauri/gen/

@@ -14,7 +14,7 @@ export default function App() {
       <DashboardHeader />
 
       {/* Main Content Stage */}
-      <main className="flex-1 py-10 px-4 md:px-8 xl:px-12 max-w-7xl w-full mx-auto space-y-12">
+      <main className="flex-1 py-6 md:py-10 px-3 sm:px-4 md:px-8 xl:px-12 max-w-7xl w-full mx-auto space-y-8 md:space-y-12 overflow-x-hidden">
         
         {/* Main Gematria Simulator & Calculator */}
         <GematriaCalculator />

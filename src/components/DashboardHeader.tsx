@@ -12,15 +12,15 @@ interface HeaderProps {
 
 export default function DashboardHeader({ activeTab, setActiveTab }: HeaderProps) {
   return (
-    <header className="bg-neutral-900 border-b border-amber-900/40 text-neutral-100 py-5 px-6 md:px-12 sticky top-0 z-50 backdrop-blur-md bg-neutral-900/90">
-      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+    <header className="bg-neutral-900 border-b border-amber-900/40 text-neutral-100 py-4 md:py-5 px-4 sm:px-6 md:px-12 sticky top-0 z-50 backdrop-blur-md bg-neutral-900/90">
+      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 md:gap-6">
         {/* Brand */}
         <div className="flex items-center gap-3.5 shrink-0">
           <div className="bg-amber-500/10 border border-amber-500/30 p-2.5 rounded-lg flex items-center justify-center text-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.15)]">
             <Terminal className="h-6 w-6" id="header-logo-icon" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-white font-display flex items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white font-display flex flex-wrap items-center gap-2">
               S H E M O T
               <span className="text-[10px] uppercase font-mono tracking-widest px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">
                 MOTOR DE GEMATRIA

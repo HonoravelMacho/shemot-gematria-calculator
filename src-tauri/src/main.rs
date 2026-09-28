@@ -1,23 +1,22 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 #![cfg_attr(
     all(not(debug_assertions), target_os = "windows"),
     windows_subsystem = "windows"
 )]
 
+//! Shemot Gematria — Tauri v2 host (desktop + Android).
+//! SPDX-License-Identifier: Apache-2.0
+
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use serde::Serialize;
+use tauri::Emitter;
 
 use gematria::{
     backtrack_latino_etimologico, backtrack_latino_custom,
     backtrack_hebraico, backtrack_grego,
     LatinoEstilo, LatinoAvancado, WildcardSpec,
-    Dictionary, DictionaryManager, DictionaryEntry,
+    Dictionary, DictionaryManager,
 };
 
 // Payload for real-time progress events
@@ -43,14 +42,14 @@ struct RichResult {
 }
 
 #[tauri::command]
-fn cancel_search(state: tauri::State<'_, AppState>) {
+fn cancel_search(state: tauri::State<AppState>) {
     state.cancel_flag.store(true, Ordering::Relaxed);
 }
 
 #[tauri::command]
 fn run_gematria_search(
     window: tauri::Window,
-    state: tauri::State<'_, AppState>,
+    state: tauri::State<AppState>,
     target_value: u32,
     total_length: usize,
     alphabet: String, // "latino" | "hebraico" | "grego"
@@ -289,7 +288,7 @@ fn run_gematria_search(
 
 #[tauri::command]
 fn quick_lookup_dictionary(
-    state: tauri::State<'_, AppState>,
+    state: tauri::State<AppState>,
     word: String,
     alphabet: String,
 ) -> Result<Option<RichResult>, String> {
@@ -350,6 +349,7 @@ fn main() {
     };
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_shell::init())
         .manage(state)
         .invoke_handler(tauri::generate_handler![
             run_gematria_search,

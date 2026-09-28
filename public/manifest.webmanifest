@@ -1,0 +1,11 @@
+{
+  "name": "Shemot Gematria",
+  "short_name": "Shemot",
+  "description": "Calculadora e motor de busca de Gematria (Hebreu, Grego e Latino) com engine Rust offline.",
+  "start_url": ".",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
+  "icons": []
+}

@@ -5,15 +5,23 @@ on:
     tags:
       - "v*"
 
+permissions:
+  contents: write
+
 jobs:
-  publish-tauri:
-    permissions:
-      contents: write
+  # ── Desktop: Tauri v2 gera .deb/.rpm/.AppImage (linux),
+  #    .exe/.msi (windows), .dmg/.app.tar.gz (macOS) ──
+  publish-desktop:
     strategy:
       fail-fast: false
       matrix:
-        platform: [ubuntu-22.04, windows-latest]
-
+        include:
+          - platform: ubuntu-22.04
+            args: ""
+          - platform: windows-latest
+            args: ""
+          - platform: macos-latest
+            args: ""
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Checkout repository
@@ -23,27 +31,143 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: npm
 
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
 
       - name: Install system dependencies (Ubuntu only)
         if: matrix.platform == 'ubuntu-22.04'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libayatana-appindicator3-dev librsvg2-dev patchelf libssl-dev
+          sudo apt-get install -y \
+            libgtk-3-dev \
+            libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            patchelf \
+            libssl-dev \
+            rpm
 
       - name: Install frontend dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build and Publish Release Artifacts
-        uses: tauri-apps/tauri-action@v1
+        uses: tauri-apps/tauri-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: v__VERSION__ # Substituído automaticamente pela versão declarada no tauri.conf.json
-          releaseName: "Shemot Gematria v__VERSION__"
-          releaseBody: "Nova versão automática gerada pelo motor combinatório de ultra velocidade do Shemot Gematria!"
-          releaseDraft: true
+          tagName: ${{ github.ref_name }}
+          releaseName: "Shemot Gematria ${{ github.ref_name }}"
+          releaseBody: "Release automática do motor combinatório Shemot (Rust + Tauri v2). Inclui instaladores desktop; veja também os assets .tar.gz portátil e .apk Android."
+          releaseDraft: false
           prerelease: false
+          args: ${{ matrix.args }}
+
+  # ── Portátil .tar.gz: dist web + binário CLI Rust (shemot-rust) ──
+  portable-tarball:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Build frontend (dist)
+        run: npm run build
+
+      - name: Build Rust CLI (release)
+        run: cargo build --release --manifest-path shemot-rust/Cargo.toml
+
+      - name: Pack .tar.gz
+        run: |
+          STAGE="shemot-${{ github.ref_name }}-linux-x86_64"
+          mkdir -p "$STAGE"
+          cp -r dist "$STAGE/"
+          cp shemot-rust/target/release/shemot "$STAGE/shemot-cli" 2>/dev/null || cp shemot-rust/target/release/shemot.exe "$STAGE/" 2>/dev/null || true
+          cp README.md "$STAGE/" 2>/dev/null || true
+          tar -czf "$STAGE.tar.gz" "$STAGE"
+          echo "ASSET=$STAGE.tar.gz" >> "$GITHUB_ENV"
+          ls -lh "$STAGE.tar.gz"
+
+      - name: Upload .tar.gz to release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: ${{ env.ASSET }}
+
+  # ── Android .apk debug (auto-assinado, instala direto no celular) ──
+  # Tauri v2 mobile: a engine Rust compila nativo para ARM via NDK.
+  # APK debug já vem assinado com chave de teste — ideal para sideload.
+  # (O .aab assinado para Play Store fica para o futuro, com keystore próprio.)
+  android-apk:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install Rust stable + Android targets
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,x86_64-linux-android,i686-linux-android
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android NDK
+        run: |
+          sdkmanager "platform-tools" "platforms;android-34" "ndk;27.0.12077973"
+          NDK_DIR="$ANDROID_HOME/ndk/27.0.12077973"
+          echo "NDK_HOME=$NDK_DIR" >> "$GITHUB_ENV"
+          echo "ANDROID_NDK_HOME=$NDK_DIR" >> "$GITHUB_ENV"
+          "$NDK_DIR/ndk-build" --version 2>&1 | head -n 2 || true
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Init Android project (se ainda não existir)
+        run: |
+          if [ ! -d "src-tauri/gen/android" ]; then
+            npx tauri android init --ci --skip-targets-install
+          fi
+
+      - name: Build Android APK (debug, auto-assinado)
+        run: npx tauri android build --debug --apk --ci
+
+      - name: Locate APKs
+        run: |
+          find src-tauri/gen/android -name "*.apk" -type f | tee apk-list.txt
+          cat apk-list.txt
+
+      - name: Upload .apk to release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: src-tauri/gen/android/**/*.apk
