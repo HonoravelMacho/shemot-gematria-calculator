@@ -9,6 +9,7 @@ pub mod rules_greek;
 pub mod rules_hebrew;
 pub mod search;
 pub mod dictionaries;
+pub mod wordlists;
 
 // Re-export core items for clean external access
 pub use alphabets::valor_letra_latino;
@@ -30,4 +31,7 @@ pub use dictionaries::{
     Dictionary, DictionaryEntry, InMemoryDictionary, DictionaryManager,
     load_default_portuguese_dictionary, load_default_greek_dictionary,
     load_default_hebrew_dictionary,
+};
+pub use wordlists::{
+    normalize_word, wordlist_contains, wordlist_ids, matched_wordlists,
 };

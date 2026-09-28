@@ -35,6 +35,8 @@ struct RichResult {
     translation: String,
     description: String,
     original_word: String,
+    /// ids das wordlists da comunidade que contêm a palavra (ex.: ["pt-BR"]).
+    in_wordlists: Vec<String>,
 }
 
 #[tauri::command]
@@ -271,11 +273,12 @@ fn run_gematria_search(
         }
 
         rich_results.push(RichResult {
-            word: r,
+            word: r.clone(),
             has_meaning,
             translation,
             description,
             original_word,
+            in_wordlists: gematria::matched_wordlists(&r),
         });
     }
 
@@ -327,11 +330,12 @@ fn quick_lookup_dictionary(
 
     if has_meaning {
         Ok(Some(RichResult {
-            word: clean_word,
+            word: clean_word.clone(),
             has_meaning,
             translation,
             description,
             original_word,
+            in_wordlists: gematria::matched_wordlists(&clean_word),
         }))
     } else {
         Ok(None)

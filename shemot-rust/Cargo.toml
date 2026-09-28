@@ -1,6 +1,6 @@
 [package]
 name = "shemot"
-version = "1.0.7"
+version = "1.0.11"
 edition = "2021"
 authors = ["Tiago Rabelo Sels"]
 description = "SHEMOT - High-performance Gematria Search Engine in Rust"
@@ -8,4 +8,7 @@ description = "SHEMOT - High-performance Gematria Search Engine in Rust"
 [dependencies]
 colored = "2.1"
 serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+[build-dependencies]
 serde_json = "1.0"

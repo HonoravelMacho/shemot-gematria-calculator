@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "wordlists": [
+    {
+      "id": "pt-BR",
+      "name": "Português Brasileiro (filtro)",
+      "lang": "pt-BR",
+      "alphabet": "Latino",
+      "kind": "filter",
+      "version": "1.0.0",
+      "file": "pt-BR/words.txt",
+      "entries": 257954,
+      "normalization": "lowercase + NFD sem diacríticos (a-z)",
+      "description": "Wordlist de formas plenas para filtrar combinações geradas. Sem descrições (verbetes curados continuam no dicionário hermético embutido).",
+      "source": "wordlist 'brazilian' do sistema (ispell/wbrazilian, DFSG-free)",
+      "license": "Ver dictionaries/pt-BR/README.md"
+    }
+  ]
+}

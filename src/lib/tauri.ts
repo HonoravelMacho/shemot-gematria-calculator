@@ -13,6 +13,8 @@ export interface RichResult {
   translation: string;
   description: string;
   original_word: string;
+  /** ids das wordlists da comunidade que contêm a palavra (ex.: ["pt-BR"]). */
+  in_wordlists?: string[];
 }
 
 export interface SearchProgress {

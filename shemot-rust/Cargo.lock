@@ -93,7 +93,7 @@ dependencies = [
 
 [[package]]
 name = "shemot"
-version = "1.0.5"
+version = "1.0.7"
 dependencies = [
  "colored",
  "serde",

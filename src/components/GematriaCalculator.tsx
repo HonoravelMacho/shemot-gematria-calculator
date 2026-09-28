@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { 
   Play, Download, Trash2, Cpu, Sparkles, Filter, 
   HelpCircle, Settings, ChevronRight, CheckCircle, Flame,
@@ -11,6 +11,10 @@ import {
 } from "lucide-react";
 import { AlphabetType, LatinoEstilo, LatinoAvancado, SearchStats } from "../types";
 import { invokeSearch, invokeCancel, listenProgress, isTauriRuntime, saveTextFileNative } from "../lib/tauri";
+import {
+  fetchRegistry, wordlistsForAlphabet, loadWordlist, wordlistContains,
+  type WordlistEntry,
+} from "../data/dictLoader";
 import { 
   GREEK_DICTIONARY, 
   HEBREW_DICTIONARY, 
@@ -779,6 +783,7 @@ export default function GematriaCalculator() {
     setIsSearching(true);
     cancelRef.current = false;
     setResults([]);
+    setTauriWordlists(new Map());
 
     const startTime = performance.now();
     let combinacoesTestadas = 0;
@@ -916,6 +921,8 @@ export default function GematriaCalculator() {
 
         const wordsOnly = tauriResults.map(r => r.word);
         const combined = Array.from(new Set([...itemsEncontrados, ...wordsOnly]));
+        // Guarda os ids de wordlists (ex.: pt-BR) vindos da engine Rust por palavra.
+        setTauriWordlists(new Map(tauriResults.map(r => [r.word as string, (r.in_wordlists ?? []) as string[]])));
 
         setResults(combined);
         setStats({
@@ -1501,9 +1508,68 @@ export default function GematriaCalculator() {
   const realWordsList = matchedEntries.filter(m => m.entry !== null);
 
   // Decide what to display based on dictionaryFilterMode
-  const displayedResults = (dictionaryFilterMode === "words-only" || dictionaryFilterMode === "words-meanings")
+  const baseDisplayedResults = (dictionaryFilterMode === "words-only" || dictionaryFilterMode === "words-meanings")
     ? realWordsList.map(m => m.originalString)
     : results;
+
+  // Wordlists da comunidade (ex.: PT-BR): filtro adicional sob demanda
+  const [wordlists, setWordlists] = useState<WordlistEntry[]>([]);
+  const [wordlistId, setWordlistId] = useState<string | null>(null);
+  const [wordlistSet, setWordlistSet] = useState<Set<string> | null>(null);
+  const [wordlistLoading, setWordlistLoading] = useState<boolean>(false);
+  const [wordlistError, setWordlistError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    setWordlistId(null);
+    setWordlistSet(null);
+    setWordlistError(null);
+    fetchRegistry()
+      .then((r) => { if (alive) setWordlists(wordlistsForAlphabet(r, alphabet)); })
+      .catch(() => { if (alive) setWordlists([]); });
+    return () => { alive = false; };
+  }, [alphabet]);
+
+  const handleWordlistSelect = async (id: string) => {
+    if (!id) {
+      setWordlistId(null);
+      setWordlistSet(null);
+      setWordlistError(null);
+      return;
+    }
+    const entry = wordlists.find((w) => w.id === id);
+    if (!entry) return;
+    setWordlistId(id);
+    setWordlistSet(null);
+    setWordlistError(null);
+    setWordlistLoading(true);
+    try {
+      const set = await loadWordlist(entry);
+      setWordlistSet(set);
+    } catch (e) {
+      setWordlistError("Falha ao carregar a wordlist.");
+      setWordlistId(null);
+    } finally {
+      setWordlistLoading(false);
+    }
+  };
+
+  // Wordlists vindas da engine Rust (por palavra) + wordlist carregada no frontend.
+  const [tauriWordlists, setTauriWordlists] = useState<Map<string, string[]>>(new Map());
+
+  const displayedResults = (wordlistId && wordlistSet)
+    ? baseDisplayedResults.filter((r) => wordlistContains(wordlistId, r))
+    : baseDisplayedResults;
+
+  const badgesFor = (r: string): string[] => {
+    const out = new Set<string>(tauriWordlists.get(r) ?? []);
+    if (wordlistId && wordlistSet && wordlistContains(wordlistId, r)) {
+      out.add(wordlistId);
+    }
+    return [...out];
+  };
+
+  const wordlistMatchCount = (wordlistId && wordlistSet) ? displayedResults.length : 0;
 
   // Export status feedback (desktop dialog / Android save / fallback)
   const [exportMsg, setExportMsg] = useState<string | null>(null);
@@ -2499,6 +2565,37 @@ export default function GematriaCalculator() {
             </div>
           )}
 
+          {/* Wordlists da comunidade (ex.: PT-BR completo) */}
+          {results.length > 0 && wordlists.length > 0 && (
+            <div className="bg-neutral-900/80 px-4 py-2 border-b border-neutral-800/60 flex flex-wrap items-center gap-2 text-[10px]">
+              <span className="text-neutral-500 font-mono uppercase">Wordlist:</span>
+              <select
+                value={wordlistId ?? ""}
+                onChange={(e) => handleWordlistSelect(e.target.value)}
+                disabled={wordlistLoading}
+                className="bg-neutral-950 border border-neutral-800 text-neutral-200 rounded-lg px-2 py-1.5 text-[11px] outline-none focus:border-amber-500/40 min-h-[40px] max-w-full"
+              >
+                <option value="">Sem filtro extra</option>
+                {wordlists.map((w) => (
+                  <option key={w.id} value={w.id}>
+                    {w.name} ({w.entries.toLocaleString("pt-BR")} palavras)
+                  </option>
+                ))}
+              </select>
+              {wordlistLoading && (
+                <span className="text-amber-400 font-mono animate-pulse">carregando wordlist…</span>
+              )}
+              {wordlistError && (
+                <span className="text-red-400 font-mono">{wordlistError}</span>
+              )}
+              {wordlistId && wordlistSet && !wordlistLoading && (
+                <span className="text-emerald-400 font-mono font-semibold">
+                  {wordlistMatchCount.toLocaleString("pt-BR")} na wordlist
+                </span>
+              )}
+            </div>
+          )}
+
           {/* Console Content screen */}
           <div translate="no" className="flex-1 p-3 sm:p-5 font-mono text-xs overflow-y-auto space-y-2 text-left bg-neutral-950 notranslate overscroll-contain">
             <div className="text-neutral-500">
@@ -2539,16 +2636,29 @@ export default function GematriaCalculator() {
                 }
 
                 // Default layout or words-only layout
+                const badges = badgesFor(r);
                 return (
-                  <div key={i} className="text-neutral-200 flex justify-between py-1 border-b border-neutral-900/60 hover:bg-neutral-900 px-2 rounded">
+                  <div key={i} className="text-neutral-200 flex justify-between items-center gap-2 py-1 border-b border-neutral-900/60 hover:bg-neutral-900 px-2 rounded">
                     {outputFormat === "pure" ? (
-                      <span className="text-amber-300 tracking-widest">
+                      <span className="text-amber-300 tracking-widest flex flex-wrap items-center gap-1.5">
                         {(alphabet === AlphabetType.Grego || alphabet === AlphabetType.Hebraico) && r.includes(" (") ? r.split(" (")[0] : r}
+                        {badges.map((b) => (
+                          <span key={b} className="bg-emerald-500/10 text-emerald-300 border border-emerald-500/25 text-[9px] px-1.5 py-px rounded font-sans font-semibold">
+                            {b}
+                          </span>
+                        ))}
                       </span>
                     ) : (
                       <>
-                        <span className="text-amber-300 tracking-widest">{r}</span>
-                        <span className="text-neutral-500 font-bold">= {targetValue}</span>
+                        <span className="text-amber-300 tracking-widest flex flex-wrap items-center gap-1.5">
+                          {r}
+                          {badges.map((b) => (
+                            <span key={b} className="bg-emerald-500/10 text-emerald-300 border border-emerald-500/25 text-[9px] px-1.5 py-px rounded font-sans font-semibold">
+                              {b}
+                            </span>
+                          ))}
+                        </span>
+                        <span className="text-neutral-500 font-bold whitespace-nowrap">= {targetValue}</span>
                       </>
                     )}
                   </div>
