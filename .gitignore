@@ -8,3 +8,7 @@ coverage/
 !.env.example
 # Tauri v2 mobile (gerado via `tauri android|ios init`, não versionar)
 src-tauri/gen/
+# Build Rust (nunca versionar: milhares de arquivos, centenas de MB)
+target/
+src-tauri/target/
+shemot-rust/target/
