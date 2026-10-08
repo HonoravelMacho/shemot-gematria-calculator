@@ -202,8 +202,21 @@ const GREEK_KEYBOARD_ITEMS = [
 
 export default function GematriaCalculator() {
   const [alphabet, setAlphabet] = useState<AlphabetType>(AlphabetType.Latino);
-  const [targetValue, setTargetValue] = useState<number>(55);
-  const [totalLength, setTotalLength] = useState<number>(5);
+  // Permite "" temporário para que o usuário possa apagar o campo sem
+  // o valor voltar sozinho para 1 (bug de usabilidade). A validação
+  // acontece no runSearch / onBlur.
+  const [targetValue, setTargetValue] = useState<number | "">(55);
+  const [totalLength, setTotalLength] = useState<number | "">(5);
+  const [formError, setFormError] = useState<string | null>(null);
+
+  const parseNumericInput = (raw: string): number | "" => {
+    if (raw === "") return "";
+    // Mantém só dígitos (inputs são inteiros positivos).
+    const digits = raw.replace(/\D/g, "");
+    if (digits === "") return "";
+    const n = parseInt(digits, 10);
+    return Number.isNaN(n) ? "" : n;
+  };
 
   // Latino Specific Options (Modo 1A / 1B)
   const [latinoMode, setLatinoMode] = useState<"etimologico" | "fixo">("etimologico");
@@ -783,6 +796,34 @@ export default function GematriaCalculator() {
   // TRIGGERS DE BUSCA (DFS Backtracking com Poda)
   // ===================================
   const runSearch = async () => {
+    // Validação dos campos numéricos (permite campo vazio durante digitação,
+    // mas bloqueia a busca com mensagem clara). Os guards abaixo fazem
+    // narrowing de `number | ""` para `number` no restante da função.
+    if (targetValue === "" || typeof targetValue !== "number" || Number.isNaN(targetValue) || targetValue < 1) {
+      setFormError("Informe o Valor Alvo (peso): número inteiro maior que 0.");
+      setIsSearching(false);
+      return;
+    }
+    if (totalLength === "" || typeof totalLength !== "number" || Number.isNaN(totalLength) || totalLength < 1) {
+      setFormError("Informe a Qtd de Letras: número inteiro maior que 0.");
+      setIsSearching(false);
+      return;
+    }
+    if (totalLength > 10) {
+      setFormError("A Qtd de Letras não pode ser maior que 10 (limite do motor de busca).");
+      setIsSearching(false);
+      return;
+    }
+    // Valor alvo absurdamente alto trava o motor; avisa em vez de congelar.
+    const maxSane = alphabet === AlphabetType.Latino ? totalLength * 26
+      : alphabet === AlphabetType.Grego ? totalLength * 900
+      : totalLength * 400;
+    if (targetValue > maxSane) {
+      setFormError(`Valor Alvo ${targetValue} é impossível com ${totalLength} letra(s) neste alfabeto (máximo teórico ≈ ${maxSane}).`);
+      setIsSearching(false);
+      return;
+    }
+    setFormError(null);
     setIsSearching(true);
     cancelRef.current = false;
     setResults([]);
@@ -1713,9 +1754,21 @@ export default function GematriaCalculator() {
   const [exportMsg, setExportMsg] = useState<string | null>(null);
   const [showExportModal, setShowExportModal] = useState<boolean>(false);
   const [exportText, setExportText] = useState<string>("");
+  // Diálogo "Salvar como" próprio: nome editável + explorador gráfico.
+  const [showSaveDialog, setShowSaveDialog] = useState<boolean>(false);
+  const [saveFilename, setSaveFilename] = useState<string>("");
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
-  const buildExportContent = (): { filename: string; content: string } => {
-    const filename = `shemot_${alphabet.toLowerCase()}_${targetValue}_filtered.txt`;
+  const sanitizeFilename = (raw: string): string => {
+    let name = raw.trim().replace(/[\\/:*?"<>|]/g, "_").replace(/\s+/g, "_");
+    if (!name) name = "shemot_busca";
+    if (!name.toLowerCase().endsWith(".txt")) name += ".txt";
+    return name;
+  };
+
+  const buildExportContent = (overrideFilename?: string): { filename: string; content: string } => {
+    const tv = targetValue === "" ? "busca" : String(targetValue);
+    const filename = overrideFilename || `shemot_${alphabet.toLowerCase()}_${tv}_filtered.txt`;
     let content = "";
     if (outputFormat === "pure") {
       // Formato puro de Kislev: apenas as palavras (uma por linha) sem valores ou cabeçalhos
@@ -1763,46 +1816,101 @@ export default function GematriaCalculator() {
     }
   };
 
-  const handleDownloadResults = async () => {
+  const handleDownloadResults = () => {
     if (displayedResults.length === 0) return;
     setExportMsg(null);
+    // Abre o diálogo próprio primeiro: usuário vê/edita o nome sugerido
+    // e depois escolhe visualmente onde salvar (nativo no Tauri / File
+    // System Access no navegador).
+    const { filename } = buildExportContent();
+    setSaveFilename(filename);
+    setShowSaveDialog(true);
+  };
 
-    const { filename, content: contentToSave } = buildExportContent();
-
-    // 1) Runtime Tauri (desktop + Android): salvamento nativo.
-    //    No Android o WebView não suporta <a download>, então gravamos
-    //    via plugin-fs (Downloads, com fallback para a pasta do app).
-    if (isTauriRuntime()) {
-      const res = await saveTextFileNative(filename, contentToSave);
-      if (res.ok) {
-        setExportMsg(`Arquivo salvo em: ${res.path}`);
-        return;
-      }
-      if (res.error !== "cancelado pelo usuário") {
-        // Falha nativa (ex.: permissão): oferece o texto para copiar.
-        setExportText(contentToSave);
-        setShowExportModal(true);
-        setExportMsg("Não foi possível salvar o arquivo — copie o texto abaixo.");
-        return;
-      }
-      return;
-    }
-
-    // 2) Navegador comum: download via Blob (funciona no desktop/web).
+  const saveViaBrowserPicker = async (filename: string, content: string): Promise<boolean> => {
+    // File System Access API (Chrome/Edge desktop): abre o explorador
+    // gráfico com sugestão de nome editável.
+    const w = window as unknown as {
+      showSaveFilePicker?: (opts?: {
+        suggestedName?: string;
+        types?: { description: string; accept: Record<string, string[]> }[];
+      }) => Promise<{
+        createWritable: () => Promise<{ write: (c: string) => Promise<void>; close: () => Promise<void> }>;
+      }>;
+    };
+    if (typeof w.showSaveFilePicker !== "function") return false;
     try {
-      const blob = new Blob([contentToSave], { type: "text/plain;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      setExportMsg("Download iniciado no navegador.");
-    } catch {
-      setExportText(contentToSave);
-      setShowExportModal(true);
+      const handle = await w.showSaveFilePicker({
+        suggestedName: filename,
+        types: [{ description: "Texto", accept: { "text/plain": [".txt"] } }],
+      });
+      const writable = await handle.createWritable();
+      await writable.write(content);
+      await writable.close();
+      return true;
+    } catch (e) {
+      // AbortError = usuário cancelou no explorador: não é falha.
+      if (e instanceof DOMException && e.name === "AbortError") return true;
+      return false;
+    }
+  };
+
+  const confirmSave = async () => {
+    if (displayedResults.length === 0) return;
+    const filename = sanitizeFilename(saveFilename);
+    setSaveFilename(filename);
+    const { content: contentToSave } = buildExportContent(filename);
+    setIsSaving(true);
+    try {
+      // 1) Runtime Tauri (desktop + Android): salvamento nativo.
+      //    No desktop o plugin-dialog abre o explorador "Salvar como" com
+      //    o nome sugerido (editável lá também). No Android gravamos em
+      //    Downloads com o nome escolhido (WebView não tem <a download>).
+      if (isTauriRuntime()) {
+        const res = await saveTextFileNative(filename, contentToSave);
+        if (res.ok) {
+          setExportMsg(`Arquivo salvo em: ${res.path}`);
+          setShowSaveDialog(false);
+          return;
+        }
+        if (res.error !== "cancelado pelo usuário") {
+          setExportText(contentToSave);
+          setShowSaveDialog(false);
+          setShowExportModal(true);
+          setExportMsg("Não foi possível salvar o arquivo — copie o texto abaixo.");
+          return;
+        }
+        return;
+      }
+
+      // 2) Navegador com File System Access: explorador gráfico.
+      const picked = await saveViaBrowserPicker(filename, contentToSave);
+      if (picked) {
+        setExportMsg("Arquivo salvo — você escolheu a pasta no explorador.");
+        setShowSaveDialog(false);
+        return;
+      }
+
+      // 3) Fallback: download via Blob (pasta padrão do navegador).
+      try {
+        const blob = new Blob([contentToSave], { type: "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        setExportMsg(`Download iniciado (${filename}) — verifique a pasta Downloads do navegador.`);
+        setShowSaveDialog(false);
+      } catch {
+        setExportText(contentToSave);
+        setShowSaveDialog(false);
+        setShowExportModal(true);
+      }
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -1862,8 +1970,20 @@ export default function GematriaCalculator() {
             <input
               id="input-target-value"
               type="number"
+              min={1}
+              inputMode="numeric"
+              placeholder="Ex.: 55"
               value={targetValue}
-              onChange={(e) => setTargetValue(Math.max(1, parseInt(e.target.value) || 0))}
+              onChange={(e) => {
+                setFormError(null);
+                setTargetValue(parseNumericInput(e.target.value));
+              }}
+              onBlur={() => {
+                // Se apagou tudo ou digitou 0, restaura um padrão sensato.
+                if (targetValue === "" || (typeof targetValue === "number" && targetValue < 1)) {
+                  setTargetValue(alphabet === AlphabetType.Hebraico ? 100 : alphabet === AlphabetType.Grego ? 88 : 55);
+                }
+              }}
               className="w-full bg-neutral-950 border border-neutral-800 text-white rounded-xl py-2 px-3.5 text-sm font-semibold focus:border-amber-500/50 outline-none focus:ring-1 focus:ring-amber-500/20 text-center"
             />
           </div>
@@ -1875,12 +1995,36 @@ export default function GematriaCalculator() {
             <input
               id="input-total-length"
               type="number"
+              min={1}
+              max={10}
+              inputMode="numeric"
+              placeholder="1–10"
               value={totalLength}
-              onChange={(e) => setTotalLength(Math.min(10, Math.max(1, parseInt(e.target.value) || 0)))}
+              onChange={(e) => {
+                setFormError(null);
+                const v = parseNumericInput(e.target.value);
+                // Permite apagar (""), mas avisa se passar de 10 em vez de travar o campo.
+                if (typeof v === "number" && v > 10) {
+                  setFormError("A Qtd de Letras não pode ser maior que 10 (limite do motor de busca).");
+                }
+                setTotalLength(v);
+              }}
+              onBlur={() => {
+                if (totalLength === "" || (typeof totalLength === "number" && totalLength < 1)) {
+                  setTotalLength(alphabet === AlphabetType.Hebraico || alphabet === AlphabetType.Grego ? 4 : 5);
+                } else if (typeof totalLength === "number" && totalLength > 10) {
+                  setTotalLength(10);
+                }
+              }}
               className="w-full bg-neutral-950 border border-neutral-800 text-white rounded-xl py-2 px-3.5 text-sm font-semibold focus:border-amber-500/50 outline-none focus:ring-1 focus:ring-amber-500/20 text-center"
             />
           </div>
         </div>
+        {formError && (
+          <div className="bg-red-500/10 border border-red-500/30 text-red-300 text-xs font-medium rounded-xl px-3 py-2 leading-relaxed">
+            {formError}
+          </div>
+        )}
 
         {/* Output Format selection for Kislev integration */}
         <div className="space-y-1.5 pt-2 border-t border-neutral-800/40">
@@ -2830,6 +2974,49 @@ export default function GematriaCalculator() {
         </div>
 
       </div>
+
+      {/* Diálogo "Salvar como": nome editável + explorador gráfico */}
+      {showSaveDialog && (
+        <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/70 p-3" onClick={() => !isSaving && setShowSaveDialog(false)}>
+          <div
+            className="w-full max-w-md bg-neutral-900 border border-neutral-700 rounded-2xl p-4 sm:p-5 space-y-3"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h4 className="text-sm font-bold text-white font-display">Salvar busca (.txt)</h4>
+            <p className="text-[11px] text-neutral-400 leading-relaxed">
+              Edite o nome se quiser. Ao confirmar, {isTauriRuntime() ? "o explorador do sistema abre para você escolher a pasta." : "o navegador abre o explorador para você escolher a pasta."}
+            </p>
+            <label className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider block">
+              Nome do arquivo
+            </label>
+            <input
+              autoFocus
+              value={saveFilename}
+              onChange={(e) => setSaveFilename(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter" && !isSaving && saveFilename.trim()) confirmSave(); }}
+              placeholder="shemot_latino_55_filtered.txt"
+              className="w-full bg-neutral-950 border border-neutral-700 text-white rounded-xl py-2.5 px-3.5 text-sm font-mono outline-none focus:border-amber-500/60 focus:ring-1 focus:ring-amber-500/20"
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={confirmSave}
+                disabled={isSaving || !saveFilename.trim()}
+                className="flex-1 min-h-[48px] bg-amber-500 hover:bg-amber-400 disabled:opacity-50 disabled:cursor-not-allowed text-neutral-950 font-bold rounded-xl text-sm flex items-center justify-center gap-2"
+              >
+                <Download className="h-4 w-4" />
+                {isSaving ? "Salvando…" : isTauriRuntime() ? "Escolher pasta e salvar" : "Escolher onde salvar"}
+              </button>
+              <button
+                onClick={() => setShowSaveDialog(false)}
+                disabled={isSaving}
+                className="min-h-[48px] px-5 bg-neutral-800 hover:bg-neutral-700 disabled:opacity-50 text-white font-semibold rounded-xl text-sm"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Export fallback modal (Android sem acesso a Downloads): texto + copiar */}
       {showExportModal && (
