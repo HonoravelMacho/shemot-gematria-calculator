@@ -130,7 +130,7 @@ pub struct WildcardSpec {
 fn matches_wildcards(
     word_chars: &[char],
     specs: &[WildcardSpec],
-    fixas: &std::collections::HashMap<usize, char>,
+    fixas: &std::collections::HashMap<usize, Vec<char>>,
     spec_idx: usize,
     last_word_idx: i32,
 ) -> bool {
@@ -158,7 +158,9 @@ fn matches_wildcards(
 /// Shared template-driven DFS for Latino searches.
 ///
 /// `pal_template`: fixed letter per position (`'\0'` = free slot).
-/// `fixas`: fixed positions map (used for wildcard range checks).
+/// Para o modo custom, posições com múltiplas opções (ex.: "4C,4O")
+/// vêm em `fixas` como `Vec<char>` e têm prioridade sobre `pal_template`.
+/// `fixas`: locked positions map (used for wildcard range checks + multi options).
 /// `required`: letters that must appear at least once (any position).
 /// Used by the custom/fixed mode and by each radical placement of the
 /// etimologico mode (prefix at start, suffix at end, radical centered).
@@ -169,7 +171,7 @@ fn dfs_latino_template(
     total_length: usize,
     target_value: u32,
     pal_template: &[char],
-    fixas: &HashMap<usize, char>,
+    fixas: &HashMap<usize, Vec<char>>,
     wildcards: &[WildcardSpec],
     required: &[char],
     use_estilo: bool,
@@ -238,6 +240,8 @@ fn dfs_latino_template(
     }
 
     // Required-letters pruning: missing letters must fit in the free slots ahead.
+    // Conta também as multi-opções (ex.: "4C,4O"): se alguma opção futura
+    // contém a letra, ela já é considerada satisfeita.
     if !required.is_empty() {
         let mut missing = 0;
         for &c in required {
@@ -245,6 +249,16 @@ fn dfs_latino_template(
                 continue;
             }
             if pal_template[idx..].contains(&c) {
+                continue;
+            }
+            let mut covered_by_options = false;
+            for (pos, opts) in fixas.iter() {
+                if *pos >= idx && opts.contains(&c) {
+                    covered_by_options = true;
+                    break;
+                }
+            }
+            if covered_by_options {
                 continue;
             }
             missing += 1;
@@ -261,6 +275,37 @@ fn dfs_latino_template(
         if !can_proceed_latino_in_dfs(partial, use_estilo, estilo, use_avancado, avancado) {
             return;
         }
+    }
+
+    // Multi-opções por posição têm prioridade: ex. "4C,4O" ramifica só C/O.
+    if let Some(opts) = fixas.get(&idx) {
+        for &letter in opts {
+            let weight = (letter as u32 - 'A' as u32) + 1;
+            current_word[idx] = letter;
+            dfs_latino_template(
+                idx + 1,
+                soma_atual + weight,
+                current_word,
+                total_length,
+                target_value,
+                pal_template,
+                fixas,
+                wildcards,
+                required,
+                use_estilo,
+                estilo,
+                use_avancado,
+                avancado,
+                alfabeto,
+                cancel_flag,
+                tested_count,
+                found_set,
+                results,
+                on_iteration,
+            );
+        }
+        current_word[idx] = ' ';
+        return;
     }
 
     let locked_char = pal_template[idx];
@@ -325,7 +370,7 @@ fn run_latino_template(
     target_value: u32,
     total_length: usize,
     pal_template: &[char],
-    fixas: &HashMap<usize, char>,
+    fixas: &HashMap<usize, Vec<char>>,
     wildcards: &[WildcardSpec],
     required: &[char],
     use_estilo: bool,
@@ -345,7 +390,8 @@ fn run_latino_template(
     let mut current_word = vec![' '; total_length];
 
     // Fully fixed template: single evaluation.
-    if !pal_template.contains(&'\0') {
+    // (Só vale quando NÃO há multi-opções; com "4C,4O" precisamos ramificar.)
+    if !pal_template.contains(&'\0') && fixas.is_empty() {
         let mut soma = 0u32;
         for (i, &t) in pal_template.iter().enumerate() {
             current_word[i] = t;
@@ -376,9 +422,11 @@ fn run_latino_template(
         return;
     }
 
-    // Otherwise iterate position 0 (fixed char or whole alphabet) for
-    // smooth progress callbacks; the DFS fills the rest.
-    let first_candidates: Vec<char> = if pal_template[0] != '\0' {
+    // Otherwise iterate position 0 (fixed char / multi options or whole
+    // alphabet) for smooth progress callbacks; the DFS fills the rest.
+    let first_candidates: Vec<char> = if let Some(opts) = fixas.get(&0) {
+        opts.clone()
+    } else if pal_template[0] != '\0' {
         vec![pal_template[0]]
     } else {
         alfabeto.to_vec()
@@ -493,7 +541,7 @@ pub fn backtrack_latino_etimologico(
         };
 
         let alfabeto: Vec<char> = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".chars().collect();
-        let empty_fixas: HashMap<usize, char> = HashMap::new();
+        let empty_fixas: HashMap<usize, Vec<char>> = HashMap::new();
         let empty_wildcards: Vec<WildcardSpec> = Vec::new();
         let empty_required: Vec<char> = Vec::new();
 
@@ -710,12 +758,14 @@ pub fn backtrack_latino_etimologico(
 
 /// Backtracking search engine for Latino Alphabet under Customizable structure.
 ///
+/// `fixas`: locked options per position — ex.: "4C,4O" vira
+/// `{3: ['C','O']}`; a DFS ramifica só nessas letras.
 /// `required_letters`: letters that must appear at least once in a free
 /// position (fixed positions already count). Ex.: "R" or "R,T".
 pub fn backtrack_latino_custom(
     target_value: u32,
     total_length: usize,
-    fixas: &std::collections::HashMap<usize, char>,
+    fixas: &std::collections::HashMap<usize, Vec<char>>,
     wildcards: &[WildcardSpec],
     required_letters: &str,
     use_estilo: bool,
@@ -731,11 +781,14 @@ pub fn backtrack_latino_custom(
 
     let alfabeto: Vec<char> = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".chars().collect();
 
-    // Helper template for fast lookups
+    // Helper template for fast lookups: '\0' = livre, senão 1ª opção
+    // (as demais opções vivem em `fixas` e a DFS ramifica por elas).
     let mut pal_template = vec!['\0'; total_length];
-    for (&pos, &ch) in fixas {
+    for (&pos, opts) in fixas {
         if pos < total_length {
-            pal_template[pos] = ch;
+            if let Some(&first) = opts.first() {
+                pal_template[pos] = first;
+            }
         }
     }
 
@@ -1200,9 +1253,9 @@ mod tests {
         let estilo = estilo_off();
         let avancado = avancado_off();
         let mut noop = |_: u64, _: usize| {};
-        let mut fixas = HashMap::new();
-        fixas.insert(3, 'O');
-        fixas.insert(4, 'S');
+        let mut fixas: HashMap<usize, Vec<char>> = HashMap::new();
+        fixas.insert(3, vec!['O']);
+        fixas.insert(4, vec!['S']);
         let wildcards = Vec::new();
         let res = backtrack_latino_custom(
             55, 5, &fixas, &wildcards, "R",
@@ -1214,5 +1267,35 @@ mod tests {
             assert!(w.contains('R'), "{w} sem R obrigatório");
             assert!(w.ends_with("OS"));
         }
+    }
+
+    #[test]
+    fn custom_multi_options_per_position() {
+        // L=5, alvo 55, pos4 ∈ {C,O}, pos5 ∈ {A,S}:
+        // "BRAOS" (…O,S) e "BRACA" (…C,A = 2+18+1+3+1=25? não) — o que
+        // importa: toda palavra respeita as opções e a soma.
+        let cancel = no_cancel();
+        let estilo = estilo_off();
+        let avancado = avancado_off();
+        let mut noop = |_: u64, _: usize| {};
+        let mut fixas: HashMap<usize, Vec<char>> = HashMap::new();
+        fixas.insert(3, vec!['C', 'O']);
+        fixas.insert(4, vec!['A', 'S']);
+        let wildcards = Vec::new();
+        let res = backtrack_latino_custom(
+            55, 5, &fixas, &wildcards, "",
+            false, &estilo, false, &avancado,
+            cancel, &mut noop,
+        );
+        assert!(!res.is_empty(), "multi-opções não retornou nada");
+        for w in &res {
+            let ch: Vec<char> = w.chars().collect();
+            assert_eq!(ch.len(), 5);
+            assert!(ch[3] == 'C' || ch[3] == 'O', "{w}: pos4 fora de {{C,O}}");
+            assert!(ch[4] == 'A' || ch[4] == 'S', "{w}: pos5 fora de {{A,S}}");
+            assert_eq!(valor_palavra_latino(w), 55);
+        }
+        // "BRAOS" tem que estar entre elas (2+18+1+15+19=55, …O,S).
+        assert!(res.contains(&"BRAOS".to_string()), "BRAOS sumiu: {:?}", &res[..res.len().min(5)]);
     }
 }

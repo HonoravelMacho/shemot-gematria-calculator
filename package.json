@@ -1,7 +1,7 @@
 {
   "name": "shemot-gematria-calculator",
   "private": true,
-  "version": "1.0.13",
+  "version": "1.0.14",
   "description": "Calculadora e motor de busca de Gematria (Hebreu, Grego e Latino) com dicionário offline integrado e interface mística interativa.",
   "type": "module",
   "scripts": {

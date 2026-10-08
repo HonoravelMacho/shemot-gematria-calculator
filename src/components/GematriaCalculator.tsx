@@ -227,7 +227,7 @@ export default function GematriaCalculator() {
   const [radical, setRadical] = useState<string>("");
   const [modoRadical, setModoRadical] = useState<string>("none"); // "none", "prefix", "suffix", "palindrome"
 
-  // Locked/Fixed letters e.g. "1A,3A"
+  // Locked/Fixed letters e.g. "1A,3A" ou multi "4C,4O,5A,5S"
   const [fixedLettersInput, setFixedLettersInput] = useState<string>("");
 
   // Letras obrigatórias em qualquer posição livre e.g. "R" ou "R,T"
@@ -1310,13 +1310,14 @@ export default function GematriaCalculator() {
 
       } else {
         // Option 1B: Personalizada (Locking specific letters and support wildcards e.g. "1T,#H,5C,6C")
+        // Multi-opções por posição: "4C,4O,5A,5S" = pos 4 ∈ {C,O}, pos 5 ∈ {A,S}.
         interface WildcardSpec {
           char: string;
           minIdx: number;
           maxIdx: number;
         }
 
-        const fixas: Record<number, string> = {};
+        const fixas: Record<number, string[]> = {};
         const wildcards: WildcardSpec[] = [];
 
         if (fixedLettersInput.trim()) {
@@ -1335,7 +1336,9 @@ export default function GematriaCalculator() {
               if (num && char) {
                 const idx = parseInt(num, 10) - 1;
                 if (idx >= 0 && idx < totalLength) {
-                  fixas[idx] = char;
+                  // Acumula sem repetir: "4C,4O" → fixas[3] = ["C","O"].
+                  if (!fixas[idx]) fixas[idx] = [];
+                  if (!fixas[idx].includes(char)) fixas[idx].push(char);
                   parsedItems.push({ type: "fixed", idx, char });
                 }
               }
@@ -1369,19 +1372,22 @@ export default function GematriaCalculator() {
           });
         }
 
-        const palTemplate = Array(totalLength).fill("");
-        Object.entries(fixas).forEach(([pos, letVal]) => {
+        const palTemplate: string[] = Array(totalLength).fill("");
+        // Todas as opções por posição (para poda de obrigatórias).
+        const allFixedOptions = new Set<string>();
+        Object.entries(fixas).forEach(([pos, opts]) => {
           const idx = parseInt(pos, 10);
-          if (idx < totalLength) {
-            palTemplate[idx] = letVal;
+          if (idx < totalLength && opts.length > 0) {
+            palTemplate[idx] = opts[0]; // 1ª opção (as demais ramificam na DFS)
+            opts.forEach(o => allFixedOptions.add(o));
           }
         });
 
         // Letras obrigatórias em qualquer posição livre (ex.: "R" ou "R,T").
-        // Fixas já contam: só restam as que o template ainda não contém.
+        // Fixas já contam (qualquer opção): só restam as que nenhuma fixa cobre.
         const requiredEff: string[] = [];
         for (const c of requiredLettersInput.toUpperCase()) {
-          if (c >= "A" && c <= "Z" && !requiredEff.includes(c) && !palTemplate.includes(c)) {
+          if (c >= "A" && c <= "Z" && !requiredEff.includes(c) && !allFixedOptions.has(c) && !palTemplate.includes(c)) {
             requiredEff.push(c);
           }
         }
@@ -1444,11 +1450,17 @@ export default function GematriaCalculator() {
           }
 
           // Poda por letras obrigatórias: as que faltam têm que caber nas livres à frente.
+          // Considera multi-opções futuras (qualquer opção cobre a letra).
           if (requiredEff.length > 0) {
             let missing = 0;
             for (const c of requiredEff) {
               if (currentWord.slice(0, idx).includes(c)) continue;
               if (palTemplate.slice(idx).includes(c)) continue;
+              let covered = false;
+              for (const [posStr, opts] of Object.entries(fixas)) {
+                if (parseInt(posStr, 10) >= idx && opts.includes(c)) { covered = true; break; }
+              }
+              if (covered) continue;
               missing++;
             }
             const freeRemaining = palTemplate.slice(idx).filter(t => t === "").length;
@@ -1465,7 +1477,16 @@ export default function GematriaCalculator() {
             }
           }
 
-          if (palTemplate[idx] !== "") {
+          // Multi-opções têm prioridade: "4C,4O" ramifica só C/O.
+          const optsHere = (fixas as Record<number, string[]>)[idx];
+          if (optsHere && optsHere.length > 0) {
+            for (const letter of optsHere) {
+              const weight = LAT_VALORES[letter] || 0;
+              currentWord[idx] = letter;
+              backtrackCustomSync(idx + 1, somaAtual + weight, currentWord);
+            }
+            currentWord[idx] = "";
+          } else if (palTemplate[idx] !== "") {
             const letter = palTemplate[idx];
             const weight = LAT_VALORES[letter] || 0;
             currentWord[idx] = letter;
@@ -1483,8 +1504,9 @@ export default function GematriaCalculator() {
 
         if (totalLength > 0) {
           const currentWord = Array(totalLength).fill("");
+          const firstOpts = (fixas as Record<number, string[]>)[0];
           const firstLetterTemplate = palTemplate[0];
-          const candidates = firstLetterTemplate !== "" ? [firstLetterTemplate] : ALFABETO_LAT_ARR;
+          const candidates = firstOpts && firstOpts.length > 0 ? firstOpts : firstLetterTemplate !== "" ? [firstLetterTemplate] : ALFABETO_LAT_ARR;
 
           for (let latStartIdx = 0; latStartIdx < candidates.length; latStartIdx++) {
             if (cancelRef.current) break;
@@ -2152,17 +2174,17 @@ export default function GematriaCalculator() {
               /* Option 1B: Personalizada parameters */
               <div className="space-y-3">
                 <div className="space-y-2">
-                  <span className="text-[10px] text-neutral-400 uppercase block font-mono">Fixar Posições (Ex: 1A,3M)</span>
+                  <span className="text-[10px] text-neutral-400 uppercase block font-mono">Fixar Posições (Ex: 1A,3M ou 4C,4O,5A,5S)</span>
                   <input
                     id="input-fixed-letters"
                     type="text"
-                    placeholder="Ex: 1M,3T"
+                    placeholder="Ex: 1M,3T ou 4C,4O,5A,5S"
                     value={fixedLettersInput}
                     onChange={(e) => setFixedLettersInput(e.target.value)}
                     className="w-full bg-neutral-950 text-xs text-white border border-neutral-800 rounded-lg p-2 uppercase outline-none focus:border-amber-500/40"
                   />
                   <p className="text-[10px] text-neutral-400 leading-normal">
-                    Informa posições que devem ter letras específicas. Posições são indexadas a partir de 1.
+                    Posições a partir de 1. <strong className="text-neutral-200">Várias opções por posição:</strong> <span className="font-mono text-amber-300/90">4C,4O</span> = posição 4 pode ser C <em>ou</em> O; <span className="font-mono text-amber-300/90">4C,4O,5A,5S</span> testa as 4 combinações. Também aceita <span className="font-mono">#H</span> (H em posição livre entre fixas).
                   </p>
                 </div>
                 <div className="space-y-2">

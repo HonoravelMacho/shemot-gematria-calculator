@@ -147,8 +147,10 @@ fn run_gematria_search(
                 &mut on_iter,
             );
         } else {
-            // Option 1B: Custom / Structured search with locked letters/wildcards
-            let mut fixas = HashMap::new();
+            // Option 1B: Custom / Structured search with locked letters/wildcards.
+            // Suporta múltiplas opções por posição: "4C,4O,5A,5S" = pos 4 ∈
+            // {C,O} e pos 5 ∈ {A,S}; a DFS ramifica só nessas letras.
+            let mut fixas: HashMap<usize, Vec<char>> = HashMap::new();
             let mut wildcards = Vec::new();
 
             if !fixed_letters_input.trim().is_empty() {
@@ -180,7 +182,11 @@ fn run_gematria_search(
                                 if num > 0 && num <= total_length {
                                     let idx = num - 1;
                                     if let Some(ch) = alpha_str.to_uppercase().chars().next() {
-                                        fixas.insert(idx, ch);
+                                        // Acumula opções sem repetir: "4C,4O" → {3: [C,O]}.
+                                        let entry = fixas.entry(idx).or_default();
+                                        if !entry.contains(&ch) {
+                                            entry.push(ch);
+                                        }
                                         parsed_items.push(ParsedType::Fixed { idx, char: ch });
                                     }
                                 }
