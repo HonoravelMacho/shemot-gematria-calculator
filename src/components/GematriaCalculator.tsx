@@ -281,6 +281,9 @@ export default function GematriaCalculator() {
   // Output states
   const [results, setResults] = useState<string[]>([]);
   const [isSearching, setIsSearching] = useState<boolean>(false);
+  // Vira true na primeira busca válida: permite distinguir "ainda não
+  // buscou" de "buscou e deu zero" no terminal.
+  const [hasSearched, setHasSearched] = useState<boolean>(false);
   const cancelRef = useRef<boolean>(false);
   const cancelSearch = () => {
     cancelRef.current = true;
@@ -825,6 +828,7 @@ export default function GematriaCalculator() {
     }
     setFormError(null);
     setIsSearching(true);
+    setHasSearched(true);
     cancelRef.current = false;
     setResults([]);
     setTauriWordlists(new Map());
@@ -2929,7 +2933,9 @@ export default function GematriaCalculator() {
                 <span>
                   {dictionaryFilterMode !== "all"
                     ? "Nenhuma palavra registrada no dicionário offline foi gerada com a soma solicitada. Tente outros valores."
-                    : "Nenhum teste foi iniciado ainda. Configure os filtros ao lado e clique em \"Iniciar Motor de Busca\"."}
+                    : hasSearched && !isSearching
+                      ? "Busca concluída: 0 combinações válidas. Desligue \"Regras Estilísticas\" e \"Regras Avançadas\" e tente de novo (ex.: \"Terminar com vogal\" elimina finais em S como …OS) — ou ajuste valor/letras."
+                      : "Nenhum teste foi iniciado ainda. Configure os filtros ao lado e clique em \"Iniciar Motor de Busca\"."}
                 </span>
               </div>
             ) : (

@@ -1270,15 +1270,15 @@ mod tests {
     }
 
     #[test]
-    fn custom_multi_options_per_position() {
-        // L=5, alvo 55, pos4 ∈ {C,O}, pos5 ∈ {A,S}:
-        // "BRAOS" (…O,S) e "BRACA" (…C,A = 2+18+1+3+1=25? não) — o que
-        // importa: toda palavra respeita as opções e a soma.
+    fn custom_first_position_fixed_plus_multi_options() {
+        // Entrada "1g,4c,4o,5a,5s", L=5, alvo=55.
+        // "GAMOS" = 7+1+13+15+19 = 55 tem que aparecer.
         let cancel = no_cancel();
         let estilo = estilo_off();
         let avancado = avancado_off();
         let mut noop = |_: u64, _: usize| {};
         let mut fixas: HashMap<usize, Vec<char>> = HashMap::new();
+        fixas.insert(0, vec!['G']);
         fixas.insert(3, vec!['C', 'O']);
         fixas.insert(4, vec!['A', 'S']);
         let wildcards = Vec::new();
@@ -1287,15 +1287,68 @@ mod tests {
             false, &estilo, false, &avancado,
             cancel, &mut noop,
         );
-        assert!(!res.is_empty(), "multi-opções não retornou nada");
+        assert!(!res.is_empty(), "1g,4c,4o,5a,5s L=5 alvo=55 retornou vazio!");
+        assert!(res.contains(&"GAMOS".to_string()), "GAMOS sumiu: {:?}", &res[..res.len().min(8)]);
         for w in &res {
             let ch: Vec<char> = w.chars().collect();
-            assert_eq!(ch.len(), 5);
-            assert!(ch[3] == 'C' || ch[3] == 'O', "{w}: pos4 fora de {{C,O}}");
-            assert!(ch[4] == 'A' || ch[4] == 'S', "{w}: pos5 fora de {{A,S}}");
+            assert_eq!(ch[0], 'G');
+            assert!(ch[3] == 'C' || ch[3] == 'O', "{w}");
+            assert!(ch[4] == 'A' || ch[4] == 'S', "{w}");
             assert_eq!(valor_palavra_latino(w), 55);
         }
-        // "BRAOS" tem que estar entre elas (2+18+1+15+19=55, …O,S).
-        assert!(res.contains(&"BRAOS".to_string()), "BRAOS sumiu: {:?}", &res[..res.len().min(5)]);
+    }
+
+    #[test]
+    fn custom_target74_user_case_no_filters() {
+        // Caso do usuário: 5 letras, alvo 74, "1g,4c,4o,5a,5s" sem filtros.
+        // "GLUOS" = 7+12+21+15+19 = 74 tem que aparecer.
+        let cancel = no_cancel();
+        let estilo = estilo_off();
+        let avancado = avancado_off();
+        let mut noop = |_: u64, _: usize| {};
+        let mut fixas: HashMap<usize, Vec<char>> = HashMap::new();
+        fixas.insert(0, vec!['G']);
+        fixas.insert(3, vec!['C', 'O']);
+        fixas.insert(4, vec!['A', 'S']);
+        let wildcards = Vec::new();
+        let res = backtrack_latino_custom(
+            74, 5, &fixas, &wildcards, "",
+            false, &estilo, false, &avancado,
+            cancel, &mut noop,
+        );
+        assert!(!res.is_empty(), "alvo 74 sem filtros retornou vazio!");
+        assert!(res.contains(&"GLUOS".to_string()), "GLUOS sumiu: {:?}", &res[..res.len().min(8)]);
+    }
+
+    #[test]
+    fn custom_target74_avancado_default_kills_s_endings() {
+        // Com o Avançado padrão do app (terminarComVogal=true), as
+        // terminações em S morrem e as em A são impossíveis p/ alvo 74
+        // (O,A precisa 51 nas livres, C,A precisa 63 > 52) → vazio esperado.
+        // Documenta por que o usuário pode ver "nada" com filtros ligados.
+        let cancel = no_cancel();
+        let estilo = estilo_off();
+        let avancado_app = LatinoAvancado {
+            iniciar_com_consoante: false,
+            terminar_com_vogal: true,
+            permitir_k: false,
+            permitir_w: false,
+            permitir_y: false,
+            restringir_finais: true,
+            permitir_finais_estrangeiros: false,
+            restringir_inicio_consonantal: false,
+        };
+        let mut noop = |_: u64, _: usize| {};
+        let mut fixas: HashMap<usize, Vec<char>> = HashMap::new();
+        fixas.insert(0, vec!['G']);
+        fixas.insert(3, vec!['C', 'O']);
+        fixas.insert(4, vec!['A', 'S']);
+        let wildcards = Vec::new();
+        let res = backtrack_latino_custom(
+            74, 5, &fixas, &wildcards, "",
+            false, &estilo, true, &avancado_app,
+            cancel, &mut noop,
+        );
+        assert!(res.is_empty(), "esperava vazio com terminarComVogal, veio: {:?}", &res[..res.len().min(8)]);
     }
 }
